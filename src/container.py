@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Provider, Singleton
 
+from src.infrastructure.adapters.actualizer import ActualizerAdapter
+from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.settings.actualizer import ActualizerSettings
 from src.infrastructure.settings.cleaner import CleanerSettings
 from src.infrastructure.settings.logging import LoggingSettings
@@ -25,8 +27,10 @@ class Container(DeclarativeContainer):
 
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
 
-    actualizer: Provider["ActualizerInterface"] = ...
-    cleaner: Provider["CleanerInterface"] = ...
+    actualizer: Provider["ActualizerInterface"] = Singleton(
+        ActualizerAdapter, _logger=logger.provided,
+    )
+    cleaner: Provider["CleanerInterface"] = Singleton(CleanerAdapter, _logger=logger.provided)
 
 
 CONTAINER = Container()
