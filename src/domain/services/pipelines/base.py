@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from src.domain.entities.trigger import Trigger
 
 
-class BasePipeline(Protocol):
+class PipelineRunner(Protocol):
     """Интерфейс пайплайн-раннера."""
 
     @abstractmethod

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from src.domain.entities.pipeline import PipelineName
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.pipelines.base import BasePipeline
+    from src.domain.services.pipelines.base import PipelineRunner
 
 
 @dataclass
@@ -20,7 +20,7 @@ class PipelineLauncher:
 
     _logger: "Logger"
     _next_pipelines: dict["PipelineName", "PipelineName"]
-    _runners: dict["PipelineName", "BasePipeline"]
+    _runners: dict["PipelineName", "PipelineRunner"]
     _triggers: "TriggerInterface"
 
     async def launch(self: Self, trigger: Trigger) -> None:

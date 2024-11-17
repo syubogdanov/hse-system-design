@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from src.domain.entities.message import Message
 from src.domain.entities.pipeline import PipelineName
 from src.domain.services.exceptions import ParametersError
-from src.domain.services.pipelines.base import BasePipeline
+from src.domain.services.pipelines.base import PipelineRunner
 
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class EstimationPipeline(BasePipeline):
+class EstimationPipeline(PipelineRunner):
     """Пайплайн оценки стоимости заказа."""
 
     _logger: "Logger"

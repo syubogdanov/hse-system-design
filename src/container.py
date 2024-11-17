@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from src.domain.services.interfaces.cleaner import CleanerInterface
     from src.domain.services.interfaces.configuration import ConfigurationInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.pipelines.base import BasePipeline
+    from src.domain.services.pipelines.base import PipelineRunner
 
 
 class Container(DeclarativeContainer):
@@ -37,23 +37,23 @@ class Container(DeclarativeContainer):
 
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
 
-    assignment_pipeline: Provider["BasePipeline"] = Singleton(
+    assignment_pipeline: Provider["PipelineRunner"] = Singleton(
         AssignmentPipeline,
         _logger=logger.provided,
     )
-    cancellation_pipeline: Provider["BasePipeline"] = Singleton(
+    cancellation_pipeline: Provider["PipelineRunner"] = Singleton(
         CancellationPipeline,
         _logger=logger.provided,
     )
-    estimation_pipeline: Provider["BasePipeline"] = Singleton(
+    estimation_pipeline: Provider["PipelineRunner"] = Singleton(
         EstimationPipeline,
         _logger=logger.provided,
     )
-    finishing_pipeline: Provider["BasePipeline"] = Singleton(
+    finishing_pipeline: Provider["PipelineRunner"] = Singleton(
         FinishingPipeline,
         _logger=logger.provided,
     )
-    starting_pipeline: Provider["BasePipeline"] = Singleton(
+    starting_pipeline: Provider["PipelineRunner"] = Singleton(
         StartingPipeline,
         _logger=logger.provided,
     )
@@ -77,7 +77,7 @@ class Container(DeclarativeContainer):
             PipelineName.ESTIMATE: PipelineName.ASSIGN,
         },
     )
-    runners: Provider[dict[PipelineName, "BasePipeline"]] = Dict(
+    runners: Provider[dict[PipelineName, "PipelineRunner"]] = Dict(
         {
             PipelineName.ASSIGN: assignment_pipeline.provided,
             PipelineName.CANCEL: cancellation_pipeline.provided,
