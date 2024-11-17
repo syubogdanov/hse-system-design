@@ -17,7 +17,7 @@ grpc:
 lint: ruff mypy
 
 mypy:
-	mypy .
+	$(PYTHON) -m mypy .
 
 ruff:
-	ruff check .
+	$(PYTHON) -m ruff check .
