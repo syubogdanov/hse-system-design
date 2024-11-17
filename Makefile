@@ -1,7 +1,7 @@
 lint: ruff mypy
 
 mypy:
-	mypy aiostdlib/
+	mypy .
 
 ruff:
-	ruff check aiostdlib/
+	ruff check .
