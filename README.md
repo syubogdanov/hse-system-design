@@ -1,9 +1,9 @@
 # [HSE] System Design
 
-## Team
+## Состав команды
 
-* Antonina Klimchuk;
-* Liliyana Liakh;
-* Sergei Bogdanov;
-* Stepan Balaian;
-* Viktoriia Kovalevskaia.
+* Балаян Степан;
+* Богданов Сергей;
+* Климчук Антонина;
+* Ковалевская Виктория;
+* Лях Лилиана.
