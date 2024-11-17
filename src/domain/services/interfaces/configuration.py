@@ -2,8 +2,8 @@ from abc import abstractmethod
 from typing import Protocol, Self
 
 
-class ActualizerInterface(Protocol):
-    """Интерфейс актуализатора."""
+class ConfigurationInterface(Protocol):
+    """Интерфейс конфигурации."""
 
     @abstractmethod
     async def actualize(self: Self) -> None:

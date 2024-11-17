@@ -14,14 +14,14 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class ReleasePipeline(BasePipeline):
-    """Пайплайн освобождения исполнителя."""
+class FinishingPipeline(BasePipeline):
+    """Пайплайн завершения назначения."""
 
     _logger: "Logger"
 
-    _pipeline: ClassVar[str] = PipelineName.RELEASE
+    _pipeline: ClassVar[str] = PipelineName.FINISH
 
-    async def run(self: Self, trigger: "Trigger") -> None:
+    async def run(self: Self, trigger: "Trigger") -> "Trigger":
         """Запустить пайплайн."""
         if trigger.pipeline != self._pipeline:
             raise ParametersError(Message.WRONG_PIPELINE)

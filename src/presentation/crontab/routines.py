@@ -3,14 +3,14 @@ from src.container import CONTAINER
 
 async def actualize() -> None:
     """Актуализировать конфигурацию."""
-    actualizer = CONTAINER.actualizer()
+    adapter = CONTAINER.configuration_adapter()
 
-    await actualizer.actualize()
+    await adapter.actualize()
 
 
 async def clean() -> None:
     """Очистить устаревшие данные."""
-    cleaner = CONTAINER.cleaner()
+    adapter = CONTAINER.cleaner_adapter()
     settings = CONTAINER.cleaner_settings()
 
-    await cleaner.clean(settings.retention)
+    await adapter.clean(settings.retention)

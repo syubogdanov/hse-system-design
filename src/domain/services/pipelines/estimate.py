@@ -19,9 +19,9 @@ class EstimationPipeline(BasePipeline):
 
     _logger: "Logger"
 
-    _pipeline: ClassVar[str] = PipelineName.ESTIMATION
+    _pipeline: ClassVar[str] = PipelineName.ESTIMATE
 
-    async def run(self: Self, trigger: "Trigger") -> None:
+    async def run(self: Self, trigger: "Trigger") -> "Trigger":
         """Запустить пайплайн."""
         if trigger.pipeline != self._pipeline:
             raise ParametersError(Message.WRONG_PIPELINE)

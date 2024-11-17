@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
-from src.domain.services.interfaces.actualizer import ActualizerInterface
+from src.domain.services.interfaces.configuration import ConfigurationInterface
 
 
 if TYPE_CHECKING:
@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class ActualizerAdapter(ActualizerInterface):
-    """Адаптер актуализатора."""
+class ConfigurationAdapter(ConfigurationInterface):
+    """Адаптер конфигурации."""
 
     _logger: "Logger"
 

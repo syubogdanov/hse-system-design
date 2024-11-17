@@ -10,5 +10,5 @@ class BasePipeline(Protocol):
     """Интерфейс пайплайн-раннера."""
 
     @abstractmethod
-    async def run(self: Self, trigger: "Trigger") -> None:
+    async def run(self: Self, trigger: "Trigger") -> "Trigger":
         """Запустить пайплайн."""
