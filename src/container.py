@@ -28,7 +28,8 @@ class Container(DeclarativeContainer):
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
 
     actualizer: Provider["ActualizerInterface"] = Singleton(
-        ActualizerAdapter, _logger=logger.provided,
+        ActualizerAdapter,
+        _logger=logger.provided,
     )
     cleaner: Provider["CleanerInterface"] = Singleton(CleanerAdapter, _logger=logger.provided)
 
