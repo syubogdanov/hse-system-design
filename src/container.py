@@ -13,8 +13,8 @@ from src.domain.services.pipelines.start import StartingPipeline
 from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
-from src.infrastructure.settings.actualizer import ActualizerSettings
 from src.infrastructure.settings.cleaner import CleanerSettings
+from src.infrastructure.settings.configuration import ConfigurationSettings
 from src.infrastructure.settings.logging import LoggingSettings
 from utils.logging import get_logger
 
@@ -31,8 +31,8 @@ if TYPE_CHECKING:
 class Container(DeclarativeContainer):
     """Контейнер зависимостей."""
 
-    actualizer_settings: Provider["ActualizerSettings"] = Singleton(ActualizerSettings)
     cleaner_settings: Provider["CleanerSettings"] = Singleton(CleanerSettings)
+    configuration_settings: Provider["ConfigurationSettings"] = Singleton(ConfigurationSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
 
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
