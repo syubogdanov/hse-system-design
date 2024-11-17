@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 class BasePipeline(Protocol):
-    """Интерфейс пайплайна."""
+    """Интерфейс пайплайн-раннера."""
 
     @abstractmethod
     async def run(self: Self, trigger: "Trigger") -> None:

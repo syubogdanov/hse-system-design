@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 
 from src.domain.entities.message import Message
 from src.domain.entities.pipeline import PipelineName
-from src.domain.exceptions import PipelineError
+from src.domain.services.exceptions import ParametersError
 from src.domain.services.pipelines.base import BasePipeline
 
 
@@ -24,6 +24,6 @@ class CancellationPipeline(BasePipeline):
     async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить пайплайн."""
         if trigger.pipeline != self._pipeline:
-            raise PipelineError(Message.WRONG_PIPELINE)
+            raise ParametersError(Message.WRONG_PIPELINE)
 
         ...
