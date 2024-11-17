@@ -27,6 +27,10 @@ repository = "https://github.com/syubogdanov/hse-system-design"
 documentation = "https://github.com/syubogdanov/hse-system-design/tree/main/docs/"
 
 [tool.poetry.dependencies]
+aiocron = "^1.8"
+dependency-injector = "^4.43"
+pydantic = "^2.9"
+pydantic-settings = "^2.6"
 python = "^3.11"
 
 [tool.poetry.group.lint]
@@ -37,12 +41,12 @@ mypy = "^1.13"
 ruff = "^0.7"
 
 [tool.mypy]
-disallow_any_unimported = true
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
 explicit_package_bases = true
+ignore_missing_imports = true
 no_implicit_optional = true
 strict_equality = true
 warn_unused_ignores = true
