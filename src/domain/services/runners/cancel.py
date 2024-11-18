@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from src.domain.entities.message import Message
 from src.domain.entities.task import TaskName
 from src.domain.services.exceptions import ParametersError
-from src.domain.services.tasks.base import TaskRunner
+from src.domain.services.runners.base import TaskRunner
 
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class CancellationTask(TaskRunner):
+class CancellationRunner(TaskRunner):
     """Задача отмены назначения."""
 
     _logger: "Logger"

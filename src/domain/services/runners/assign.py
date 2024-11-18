@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from src.domain.entities.message import Message
 from src.domain.entities.task import TaskName
 from src.domain.services.exceptions import ParametersError
-from src.domain.services.tasks.base import TaskRunner
+from src.domain.services.runners.base import TaskRunner
 
 
 if TYPE_CHECKING:
@@ -14,12 +14,12 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class EstimationTask(TaskRunner):
-    """Задача оценки стоимости заказа."""
+class AssignmentRunner(TaskRunner):
+    """Задача назначения исполнителя."""
 
     _logger: "Logger"
 
-    _task: ClassVar[TaskName] = TaskName.ESTIMATE
+    _task: ClassVar[TaskName] = TaskName.ASSIGN
 
     async def run(self: Self, trigger: "Trigger") -> "Trigger":
         """Запустить задачу по триггеру."""

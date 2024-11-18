@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
     from src.domain.entities.task import TaskName
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.tasks.base import TaskRunner
+    from src.domain.services.runners.base import TaskRunner
 
 
 @dataclass

@@ -5,11 +5,11 @@ from dependency_injector.providers import Dict, Provider, Singleton
 
 from src.domain.entities.task import TaskName
 from src.domain.services.launchers.task import TaskLauncher
-from src.domain.services.tasks.assign import AssignmentTask
-from src.domain.services.tasks.cancel import CancellationTask
-from src.domain.services.tasks.estimate import EstimationTask
-from src.domain.services.tasks.finish import FinishingTask
-from src.domain.services.tasks.start import StartingTask
+from src.domain.services.runners.assign import AssignmentRunner
+from src.domain.services.runners.cancel import CancellationRunner
+from src.domain.services.runners.estimate import EstimationRunner
+from src.domain.services.runners.finish import FinishingRunner
+from src.domain.services.runners.start import StartingRunner
 from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from src.domain.services.interfaces.cleaner import CleanerInterface
     from src.domain.services.interfaces.configuration import ConfigurationInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.tasks.base import TaskRunner
+    from src.domain.services.runners.base import TaskRunner
 
 
 class Container(DeclarativeContainer):
@@ -54,24 +54,24 @@ class Container(DeclarativeContainer):
         _settings=kafka_settings.provided,
     )
 
-    assignment_task: Provider["TaskRunner"] = Singleton(
-        AssignmentTask,
+    assignment_runner: Provider["TaskRunner"] = Singleton(
+        AssignmentRunner,
         _logger=logger.provided,
     )
-    cancellation_task: Provider["TaskRunner"] = Singleton(
-        CancellationTask,
+    cancellation_runner: Provider["TaskRunner"] = Singleton(
+        CancellationRunner,
         _logger=logger.provided,
     )
-    estimation_task: Provider["TaskRunner"] = Singleton(
-        EstimationTask,
+    estimation_runner: Provider["TaskRunner"] = Singleton(
+        EstimationRunner,
         _logger=logger.provided,
     )
-    finishing_task: Provider["TaskRunner"] = Singleton(
-        FinishingTask,
+    finishing_runner: Provider["TaskRunner"] = Singleton(
+        FinishingRunner,
         _logger=logger.provided,
     )
-    starting_task: Provider["TaskRunner"] = Singleton(
-        StartingTask,
+    starting_runner: Provider["TaskRunner"] = Singleton(
+        StartingRunner,
         _logger=logger.provided,
     )
 
@@ -97,11 +97,11 @@ class Container(DeclarativeContainer):
     )
     runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(
         {
-            TaskName.ASSIGN: assignment_task.provided,
-            TaskName.CANCEL: cancellation_task.provided,
-            TaskName.ESTIMATE: estimation_task.provided,
-            TaskName.FINISH: finishing_task.provided,
-            TaskName.START: starting_task.provided,
+            TaskName.ASSIGN: assignment_runner.provided,
+            TaskName.CANCEL: cancellation_runner.provided,
+            TaskName.ESTIMATE: estimation_runner.provided,
+            TaskName.FINISH: finishing_runner.provided,
+            TaskName.START: starting_runner.provided,
         },
     )
 
