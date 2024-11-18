@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ConfigurationSettings(BaseSettings):
@@ -6,3 +6,5 @@ class ConfigurationSettings(BaseSettings):
 
     # Периодичность актуализации.
     crontab: str = "* * * * *"
+
+    model_config = SettingsConfigDict(env_prefix="configuration_")

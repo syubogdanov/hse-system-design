@@ -12,10 +12,14 @@ from src.domain.services.pipelines.finish import FinishingPipeline
 from src.domain.services.pipelines.start import StartingPipeline
 from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
+from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
+from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
 from src.infrastructure.settings.cleaner import CleanerSettings
 from src.infrastructure.settings.configuration import ConfigurationSettings
+from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
+from src.infrastructure.settings.stream import StreamSettings
 from utils.logging import get_logger
 
 
@@ -34,8 +38,21 @@ class Container(DeclarativeContainer):
     cleaner_settings: Provider["CleanerSettings"] = Singleton(CleanerSettings)
     configuration_settings: Provider["ConfigurationSettings"] = Singleton(ConfigurationSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
+    kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
+    stream_settings: Provider["StreamSettings"] = Singleton(StreamSettings)
 
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
+
+    kafka_consumer: Provider["KafkaConsumerAdapter"] = Singleton(
+        KafkaConsumerAdapter,
+        _logger=logger.provided,
+        _settings=kafka_settings.provided,
+    )
+    kafka_producer: Provider["KafkaProducerAdapter"] = Singleton(
+        KafkaProducerAdapter,
+        _logger=logger.provided,
+        _settings=kafka_settings.provided,
+    )
 
     assignment_pipeline: Provider["PipelineRunner"] = Singleton(
         AssignmentPipeline,
@@ -69,6 +86,7 @@ class Container(DeclarativeContainer):
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
         TriggerAdapter,
         _logger=logger.provided,
+        _producer=kafka_producer.provided,
     )
 
     next_pipelines: Provider[dict[PipelineName, PipelineName]] = Dict(
@@ -91,6 +109,8 @@ class Container(DeclarativeContainer):
         PipelineLauncher,
         _logger=logger.provided,
         _runners=runners.provided,
+        _next_pipelines=next_pipelines.provided,
+        _trigger=trigger_adapter.provided,
     )
 
 

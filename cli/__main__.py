@@ -1,7 +1,10 @@
 from argparse import ArgumentParser
 
+from dotenv import load_dotenv
+
 from src.container import CONTAINER
 from src.presentation.crontab.launcher import CrontabLauncher
+from src.presentation.stream.launcher import StreamLauncher
 
 
 def get_parser() -> ArgumentParser:
@@ -19,6 +22,8 @@ def get_parser() -> ArgumentParser:
 
 def main() -> None:
     """Запустить компоненту."""
+    load_dotenv()
+
     parser = get_parser()
     args = parser.parse_args()
 
@@ -34,7 +39,7 @@ def main() -> None:
 
     if args.start_stream:
         logger.info("Starting the stream...")
-        raise NotImplementedError
+        StreamLauncher.launch()
 
     if args.start_grpc:
         logger.info("Starting the gRPC...")

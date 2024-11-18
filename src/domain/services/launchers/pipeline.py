@@ -16,12 +16,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class PipelineLauncher:
-    """Лаунчер триггер-событий."""
+    """Лаунчер пайплайнов."""
 
     _logger: "Logger"
     _next_pipelines: dict["PipelineName", "PipelineName"]
     _runners: dict["PipelineName", "PipelineRunner"]
-    _triggers: "TriggerInterface"
+    _trigger: "TriggerInterface"
 
     async def launch(self: Self, trigger: Trigger) -> None:
         """Запустить выполнение триггер-события."""
@@ -37,4 +37,4 @@ class PipelineLauncher:
 
         if next_pipeline is not None:
             next_trigger = trigger.model_copy(update={"pipeline": next_pipeline})
-            await self._triggers.push(next_trigger)
+            await self._trigger.push(next_trigger)

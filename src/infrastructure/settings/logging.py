@@ -1,6 +1,6 @@
 from logging import INFO
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class LoggingSettings(BaseSettings):
@@ -8,3 +8,5 @@ class LoggingSettings(BaseSettings):
 
     # Уровень логирования
     level: int = INFO
+
+    model_config = SettingsConfigDict(env_prefix="logging_")
