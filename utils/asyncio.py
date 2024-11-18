@@ -11,7 +11,7 @@ async def aiomap(
     iterable: AsyncIterable[T],
     max_concurrent_tasks: int = 1,
 ) -> None:
-    """Конкурентно применить функцию."""
+    """Применить функцию ко всем объектам итератора."""
     tasks: set[Task] = set()
 
     async for item in iterable:

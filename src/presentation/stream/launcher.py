@@ -4,7 +4,7 @@ from typing import Self
 
 from src.container import CONTAINER
 from src.presentation.stream.routines import process
-from utils.itertools import aiomap
+from utils.asyncio import aiomap
 
 
 class StreamLauncher:
