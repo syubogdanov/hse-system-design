@@ -16,5 +16,5 @@ class OrderInterface(Protocol):
         """Получить заказ по идентификатору."""
 
     @abstractmethod
-    def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None, None]:
+    def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:
         """Заблокировать выполнение задач по заказу."""
