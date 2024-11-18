@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from src.domain.entities.trigger import Trigger
 
 
-class PipelineRunner(Protocol):
-    """Интерфейс пайплайн-раннера."""
+class TaskRunner(Protocol):
+    """Интерфейс раннера задач."""
 
     @abstractmethod
     async def run(self: Self, trigger: "Trigger") -> "Trigger":
-        """Запустить пайплайн."""
+        """Запустить задачу по триггеру."""

@@ -9,23 +9,23 @@ from src.domain.services.exceptions import ServiceError
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.entities.pipeline import PipelineName
+    from src.domain.entities.task import TaskName
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.pipelines.base import PipelineRunner
+    from src.domain.services.tasks.base import TaskRunner
 
 
 @dataclass
-class PipelineLauncher:
-    """Лаунчер пайплайнов."""
+class TaskLauncher:
+    """Лаунчер задач."""
 
     _logger: "Logger"
-    _next_pipelines: dict["PipelineName", "PipelineName"]
-    _runners: dict["PipelineName", "PipelineRunner"]
+    _next_tasks: dict["TaskName", "TaskName"]
+    _runners: dict["TaskName", "TaskRunner"]
     _trigger: "TriggerInterface"
 
     async def launch(self: Self, trigger: Trigger) -> None:
         """Запустить выполнение триггер-события."""
-        runner = self._runners.get(trigger.pipeline)
+        runner = self._runners.get(trigger.task)
 
         if runner is None:
             self._logger.critical(Message.RUNNER_NOT_FOUND, extra={"trigger": trigger})
@@ -33,8 +33,8 @@ class PipelineLauncher:
 
         trigger = await runner.run(trigger)
 
-        next_pipeline = self._next_pipelines.get(trigger.pipeline)
+        next_task = self._next_tasks.get(trigger.task)
 
-        if next_pipeline is not None:
-            next_trigger = trigger.model_copy(update={"pipeline": next_pipeline})
+        if next_task is not None:
+            next_trigger = trigger.model_copy(update={"task": next_task})
             await self._trigger.push(next_trigger)

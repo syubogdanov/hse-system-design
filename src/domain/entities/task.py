@@ -1,8 +1,8 @@
 from enum import StrEnum, auto
 
 
-class PipelineName(StrEnum):
-    """Название пайплайна."""
+class TaskName(StrEnum):
+    """Название задачи."""
 
     ASSIGN = auto()
     CANCEL = auto()

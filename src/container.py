@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Dict, Provider, Singleton
 
-from src.domain.entities.pipeline import PipelineName
-from src.domain.services.launchers.pipeline import PipelineLauncher
-from src.domain.services.pipelines.assign import AssignmentPipeline
-from src.domain.services.pipelines.cancel import CancellationPipeline
-from src.domain.services.pipelines.estimate import EstimationPipeline
-from src.domain.services.pipelines.finish import FinishingPipeline
-from src.domain.services.pipelines.start import StartingPipeline
+from src.domain.entities.task import TaskName
+from src.domain.services.launchers.task import TaskLauncher
+from src.domain.services.tasks.assign import AssignmentTask
+from src.domain.services.tasks.cancel import CancellationTask
+from src.domain.services.tasks.estimate import EstimationTask
+from src.domain.services.tasks.finish import FinishingTask
+from src.domain.services.tasks.start import StartingTask
 from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from src.domain.services.interfaces.cleaner import CleanerInterface
     from src.domain.services.interfaces.configuration import ConfigurationInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.pipelines.base import PipelineRunner
+    from src.domain.services.tasks.base import TaskRunner
 
 
 class Container(DeclarativeContainer):
@@ -54,24 +54,24 @@ class Container(DeclarativeContainer):
         _settings=kafka_settings.provided,
     )
 
-    assignment_pipeline: Provider["PipelineRunner"] = Singleton(
-        AssignmentPipeline,
+    assignment_task: Provider["TaskRunner"] = Singleton(
+        AssignmentTask,
         _logger=logger.provided,
     )
-    cancellation_pipeline: Provider["PipelineRunner"] = Singleton(
-        CancellationPipeline,
+    cancellation_task: Provider["TaskRunner"] = Singleton(
+        CancellationTask,
         _logger=logger.provided,
     )
-    estimation_pipeline: Provider["PipelineRunner"] = Singleton(
-        EstimationPipeline,
+    estimation_task: Provider["TaskRunner"] = Singleton(
+        EstimationTask,
         _logger=logger.provided,
     )
-    finishing_pipeline: Provider["PipelineRunner"] = Singleton(
-        FinishingPipeline,
+    finishing_task: Provider["TaskRunner"] = Singleton(
+        FinishingTask,
         _logger=logger.provided,
     )
-    starting_pipeline: Provider["PipelineRunner"] = Singleton(
-        StartingPipeline,
+    starting_task: Provider["TaskRunner"] = Singleton(
+        StartingTask,
         _logger=logger.provided,
     )
 
@@ -89,27 +89,27 @@ class Container(DeclarativeContainer):
         _producer=kafka_producer.provided,
     )
 
-    next_pipelines: Provider[dict[PipelineName, PipelineName]] = Dict(
+    next_tasks: Provider[dict[TaskName, TaskName]] = Dict(
         {
-            PipelineName.START: PipelineName.ESTIMATE,
-            PipelineName.ESTIMATE: PipelineName.ASSIGN,
+            TaskName.START: TaskName.ESTIMATE,
+            TaskName.ESTIMATE: TaskName.ASSIGN,
         },
     )
-    runners: Provider[dict[PipelineName, "PipelineRunner"]] = Dict(
+    runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(
         {
-            PipelineName.ASSIGN: assignment_pipeline.provided,
-            PipelineName.CANCEL: cancellation_pipeline.provided,
-            PipelineName.ESTIMATE: estimation_pipeline.provided,
-            PipelineName.FINISH: finishing_pipeline.provided,
-            PipelineName.START: starting_pipeline.provided,
+            TaskName.ASSIGN: assignment_task.provided,
+            TaskName.CANCEL: cancellation_task.provided,
+            TaskName.ESTIMATE: estimation_task.provided,
+            TaskName.FINISH: finishing_task.provided,
+            TaskName.START: starting_task.provided,
         },
     )
 
-    pipeline_launcher: Provider["PipelineLauncher"] = Singleton(
-        PipelineLauncher,
+    task_launcher: Provider["TaskLauncher"] = Singleton(
+        TaskLauncher,
         _logger=logger.provided,
         _runners=runners.provided,
-        _next_pipelines=next_pipelines.provided,
+        _next_tasks=next_tasks.provided,
         _trigger=trigger_adapter.provided,
     )
 

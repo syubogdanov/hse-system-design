@@ -6,7 +6,7 @@ from src.domain.entities.trigger import Trigger
 
 async def process(event: bytes) -> None:
     """Обработать сообщение."""
-    launcher = CONTAINER.pipeline_launcher()
+    launcher = CONTAINER.task_launcher()
     logger = CONTAINER.logger()
 
     try:

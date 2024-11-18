@@ -4,5 +4,5 @@ from enum import StrEnum
 class Message(StrEnum):
     """Сообщение."""
 
-    RUNNER_NOT_FOUND = "The pipeline's runner was not found"
-    WRONG_PIPELINE = "The wrong pipeline was launched"
+    RUNNER_NOT_FOUND = "The task's runner was not found"
+    WRONG_TASK = "The wrong task was launched"

@@ -2,13 +2,13 @@ from typing import Self
 
 from pydantic import BaseModel
 
-from src.domain.entities.pipeline import PipelineName
+from src.domain.entities.task import TaskName
 
 
 class Trigger(BaseModel):
     """Сущность триггера."""
 
-    pipeline: PipelineName
+    task: TaskName
 
     def to_bytes(self: Self) -> bytes:
         """Отобразить в `bytes`."""

@@ -6,5 +6,5 @@ class ParametersError(ServiceError):
     """Ошибка параметров."""
 
 
-class PipelineError(ServiceError):
-    """Ошибка выполнения пайплайна."""
+class TaskError(ServiceError):
+    """Ошибка выполнения задачи."""
