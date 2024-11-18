@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.entities.trigger import Trigger
+    from src.domain.services.interfaces.order import OrderInterface
 
 
 @dataclass
@@ -18,6 +19,7 @@ class FinishingRunner(TaskRunner):
     """Задача завершения назначения."""
 
     _logger: "Logger"
+    _order: "OrderInterface"
 
     _task: ClassVar[TaskName] = TaskName.FINISH
 
@@ -26,4 +28,5 @@ class FinishingRunner(TaskRunner):
         if trigger.task != self._task:
             raise ParametersError(Message.WRONG_TASK)
 
-        ...
+        async with self._order.lock(trigger.order_id):
+            ...

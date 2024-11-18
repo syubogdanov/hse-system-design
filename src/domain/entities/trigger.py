@@ -1,4 +1,5 @@
 from typing import Self
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -9,6 +10,7 @@ class Trigger(BaseModel):
     """Сущность триггера."""
 
     task: TaskName
+    order_id: UUID
 
     def to_bytes(self: Self) -> bytes:
         """Отобразить в `bytes`."""

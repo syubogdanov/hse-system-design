@@ -95,6 +95,7 @@ class Container(DeclarativeContainer):
             TaskName.ESTIMATE: TaskName.ASSIGN,
         },
     )
+
     runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(
         {
             TaskName.ASSIGN: assignment_runner.provided,
