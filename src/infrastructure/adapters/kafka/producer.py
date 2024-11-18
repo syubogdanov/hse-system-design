@@ -23,5 +23,6 @@ class KafkaProducerAdapter:
             bootstrap_servers=self._settings.bootstrap_servers,
             client_id=self._settings.client_id,
         )
+
         async with producer as context:
             await context.send_and_wait(self._settings.topic_name, message)
