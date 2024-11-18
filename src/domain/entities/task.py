@@ -1,5 +1,5 @@
 from enum import StrEnum, auto
-from typing import Self, assert_never
+from typing import Self
 
 
 class TaskName(StrEnum):
@@ -28,7 +28,8 @@ class TaskName(StrEnum):
         if self == TaskName.FINISH:
             return None
 
-        assert_never(self)
+        detail = "This code must be unreachable"
+        raise RuntimeError(detail)
 
     def get_previous(self: Self) -> set["TaskName"]:
         """Получить предыдущие задачи."""
@@ -47,4 +48,5 @@ class TaskName(StrEnum):
         if self == TaskName.FINISH:
             return {TaskName.ASSIGN}
 
-        assert_never(self)
+        detail = "This code must be unreachable"
+        raise RuntimeError(detail)
