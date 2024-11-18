@@ -14,6 +14,7 @@ from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
 from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
 from src.infrastructure.settings.cleaner import CleanerSettings
 from src.infrastructure.settings.configuration import ConfigurationSettings
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
 
     from src.domain.services.interfaces.cleaner import CleanerInterface
     from src.domain.services.interfaces.configuration import ConfigurationInterface
+    from src.domain.services.interfaces.order import OrderInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
     from src.domain.services.runners.base import TaskRunner
 
@@ -54,27 +56,6 @@ class Container(DeclarativeContainer):
         _settings=kafka_settings.provided,
     )
 
-    assignment_runner: Provider["TaskRunner"] = Singleton(
-        AssignmentRunner,
-        _logger=logger.provided,
-    )
-    cancellation_runner: Provider["TaskRunner"] = Singleton(
-        CancellationRunner,
-        _logger=logger.provided,
-    )
-    estimation_runner: Provider["TaskRunner"] = Singleton(
-        EstimationRunner,
-        _logger=logger.provided,
-    )
-    finishing_runner: Provider["TaskRunner"] = Singleton(
-        FinishingRunner,
-        _logger=logger.provided,
-    )
-    starting_runner: Provider["TaskRunner"] = Singleton(
-        StartingRunner,
-        _logger=logger.provided,
-    )
-
     cleaner_adapter: Provider["CleanerInterface"] = Singleton(
         CleanerAdapter,
         _logger=logger.provided,
@@ -83,10 +64,40 @@ class Container(DeclarativeContainer):
         ConfigurationAdapter,
         _logger=logger.provided,
     )
+    order_adapter: Provider["OrderInterface"] = Singleton(
+        OrderAdapter,
+        _logger=logger.provided,
+    )
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
         TriggerAdapter,
         _logger=logger.provided,
         _producer=kafka_producer.provided,
+    )
+
+    assignment_runner: Provider["TaskRunner"] = Singleton(
+        AssignmentRunner,
+        _logger=logger.provided,
+        _order=order_adapter.provided,
+    )
+    cancellation_runner: Provider["TaskRunner"] = Singleton(
+        CancellationRunner,
+        _logger=logger.provided,
+        _order=order_adapter.provided,
+    )
+    estimation_runner: Provider["TaskRunner"] = Singleton(
+        EstimationRunner,
+        _logger=logger.provided,
+        _order=order_adapter.provided,
+    )
+    finishing_runner: Provider["TaskRunner"] = Singleton(
+        FinishingRunner,
+        _logger=logger.provided,
+        _order=order_adapter.provided,
+    )
+    starting_runner: Provider["TaskRunner"] = Singleton(
+        StartingRunner,
+        _logger=logger.provided,
+        _order=order_adapter.provided,
     )
 
     next_tasks: Provider[dict[TaskName, TaskName]] = Dict(
