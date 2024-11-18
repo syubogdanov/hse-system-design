@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 
 from src.domain.entities.message import Message
 from src.domain.entities.task import TaskName
-from src.domain.services.exceptions import ParametersError
+from src.domain.services.exceptions import ParametersError, TaskError
 from src.domain.services.runners.base import TaskRunner
 
 
@@ -29,4 +29,9 @@ class EstimationRunner(TaskRunner):
             raise ParametersError(Message.WRONG_TASK)
 
         async with self._order.lock(trigger.order_id):
+            order = await self._order.get(trigger.order_id)
+
+            if order.last_task not in self._task.get_previous():
+                raise TaskError(Message.BROKEN_ORDER)
+
             ...

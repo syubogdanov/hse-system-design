@@ -100,13 +100,6 @@ class Container(DeclarativeContainer):
         _order=order_adapter.provided,
     )
 
-    next_tasks: Provider[dict[TaskName, TaskName]] = Dict(
-        {
-            TaskName.START: TaskName.ESTIMATE,
-            TaskName.ESTIMATE: TaskName.ASSIGN,
-        },
-    )
-
     runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(
         {
             TaskName.ASSIGN: assignment_runner.provided,
@@ -121,7 +114,6 @@ class Container(DeclarativeContainer):
         TaskLauncher,
         _logger=logger.provided,
         _runners=runners.provided,
-        _next_tasks=next_tasks.provided,
         _trigger=trigger_adapter.provided,
     )
 
