@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 
 from src.domain.entities.message import Message
+from src.domain.entities.order import Order
 from src.domain.entities.task import TaskName
 from src.domain.services.exceptions import ParametersError, TaskError
 from src.domain.services.runners.base import TaskRunner
@@ -29,9 +30,10 @@ class StartingRunner(TaskRunner):
             raise ParametersError(Message.WRONG_TASK)
 
         async with self._order.lock(trigger.order_id):
-            order = await self._order.get(trigger.order_id)
+            if await self._order.exists(trigger.order_id):
+                raise TaskError(Message.ALREADY_EXISTS)
 
-            if order.last_task not in self._task.get_previous():
-                raise TaskError(Message.BROKEN_ORDER)
+            order = Order(id=trigger.order_id)
+            await self._order.update_or_create(order)
 
-            ...
+            return trigger
