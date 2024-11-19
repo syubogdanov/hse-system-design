@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class TaskLauncher:
-    """Лаунчер задач."""
+class TriggerLauncher:
+    """Лаунчер триггеров."""
 
     _logger: "Logger"
     _runners: dict["TaskName", "TaskRunner"]

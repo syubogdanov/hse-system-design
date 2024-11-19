@@ -10,7 +10,7 @@ class ConfigurationInterface(Protocol):
     """Интерфейс конфигурации."""
 
     @abstractmethod
-    async def get(self: Self) -> "Configuration":
+    async def get(self: Self) -> "Configuration | None":
         """Получить конфигурацию."""
 
     @abstractmethod

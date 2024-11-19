@@ -4,7 +4,7 @@ from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Dict, Provider, Singleton
 
 from src.domain.entities.task import TaskName
-from src.domain.services.launchers.task import TaskLauncher
+from src.domain.services.launchers.trigger import TriggerLauncher
 from src.domain.services.runners.assign import AssignmentRunner
 from src.domain.services.runners.cancel import CancellationRunner
 from src.domain.services.runners.estimate import EstimationRunner
@@ -110,8 +110,8 @@ class Container(DeclarativeContainer):
         },
     )
 
-    task_launcher: Provider["TaskLauncher"] = Singleton(
-        TaskLauncher,
+    trigger_launcher: Provider["TriggerLauncher"] = Singleton(
+        TriggerLauncher,
         _logger=logger.provided,
         _runners=runners.provided,
         _trigger=trigger_adapter.provided,
