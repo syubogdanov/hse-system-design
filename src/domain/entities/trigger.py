@@ -9,8 +9,8 @@ from src.domain.entities.task import TaskName
 class Trigger(BaseModel):
     """Сущность триггера."""
 
+    job_id: UUID
     task: TaskName
-    order_id: UUID
 
     def to_bytes(self: Self) -> bytes:
         """Отобразить в `bytes`."""

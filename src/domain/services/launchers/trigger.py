@@ -25,8 +25,7 @@ class TriggerLauncher:
     async def launch(self: Self, trigger: Trigger) -> None:
         """Запустить выполнение триггер-события."""
         if (runner := self._runners.get(trigger.task)) is None:
-            self._logger.critical(Message.RUNNER_NOT_FOUND, extra={"trigger": trigger})
-            raise ServiceError(Message.RUNNER_NOT_FOUND)
+            raise ServiceError(Message.TASK_RUNNER_NOT_FOUND)
 
         await runner.run(trigger)
 

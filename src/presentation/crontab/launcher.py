@@ -3,7 +3,7 @@ from asyncio.events import get_event_loop
 from aiocron import crontab
 
 from src.container import CONTAINER
-from src.presentation.crontab.routines import actualize_configuration, cleanup
+from src.presentation.crontab.routines import actualize_configuration, clean_jobs
 
 
 class CrontabLauncher:
@@ -14,10 +14,10 @@ class CrontabLauncher:
         """Запустить кронтабы."""
         loop = get_event_loop()
 
-        cleaner_settings = CONTAINER.cleaner_settings()
         configuration_settings = CONTAINER.configuration_settings()
+        job_settings = CONTAINER.job_settings()
 
         crontab(configuration_settings.crontab, actualize_configuration, loop=loop)
-        crontab(cleaner_settings.crontab, cleanup, loop=loop)
+        crontab(job_settings.clean_crontab, clean_jobs, loop=loop)
 
         loop.run_forever()

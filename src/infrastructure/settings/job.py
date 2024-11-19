@@ -3,12 +3,12 @@ from datetime import timedelta
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class CleanerSettings(BaseSettings):
-    """Настройки очистителя."""
+class JobSettings(BaseSettings):
+    """Настройки работ."""
 
     # Периодичность очистки.
-    crontab: str = "* * * * *"
+    clean_crontab: str = "* * * * *"
     # Максимально допустимый возраст данных.
     retention: timedelta = timedelta(days=365)
 
-    model_config = SettingsConfigDict(env_prefix="cleaner_")
+    model_config = SettingsConfigDict(env_prefix="job_")

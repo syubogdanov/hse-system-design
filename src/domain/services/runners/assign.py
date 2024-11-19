@@ -11,27 +11,27 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.entities.trigger import Trigger
-    from src.domain.services.interfaces.order import OrderInterface
+    from src.domain.services.interfaces.job import JobInterface
 
 
 @dataclass
 class AssignmentRunner(TaskRunner):
     """Задача назначения исполнителя."""
 
+    _jobs: "JobInterface"
     _logger: "Logger"
-    _order: "OrderInterface"
 
     _task: ClassVar[TaskName] = TaskName.ASSIGN
 
     async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить задачу по триггеру."""
         if trigger.task != self._task:
-            raise ParametersError(Message.WRONG_RUNNER)
+            raise ParametersError(Message.WRONG_TASK_RUNNER)
 
-        async with self._order.lock(trigger.order_id):
-            order = await self._order.get(trigger.order_id)
+        async with self._jobs.lock(trigger.job_id):
+            job = await self._jobs.get(trigger.job_id)
 
-            if order.last_task not in self._task.get_previous():
-                raise TaskError(Message.BROKEN_TASK_ORDER)
+            if job.task not in self._task.get_previous():
+                raise TaskError(Message.WRONG_TASK_ORDER)
 
             ...

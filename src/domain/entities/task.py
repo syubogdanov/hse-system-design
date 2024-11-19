@@ -33,7 +33,7 @@ class TaskName(StrEnum):
         return unreachable()
 
     def get_previous(self: Self) -> set["TaskName"]:
-        """Получить допустимые предыдущие задачи."""
+        """Получить предыдущую задачу."""
         if self == TaskName.START:
             return set()
 

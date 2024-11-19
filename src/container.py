@@ -10,26 +10,24 @@ from src.domain.services.runners.cancel import CancellationRunner
 from src.domain.services.runners.estimate import EstimationRunner
 from src.domain.services.runners.finish import FinishingRunner
 from src.domain.services.runners.start import StartingRunner
-from src.infrastructure.adapters.cleaner import CleanerAdapter
 from src.infrastructure.adapters.configuration import ConfigurationAdapter
+from src.infrastructure.adapters.job import JobAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
 from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
-from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
-from src.infrastructure.settings.cleaner import CleanerSettings
 from src.infrastructure.settings.configuration import ConfigurationSettings
+from src.infrastructure.settings.job import JobSettings
 from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
-from src.infrastructure.settings.stream import StreamSettings
+from src.infrastructure.settings.task import TaskSettings
 from utils.logging import get_logger
 
 
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.services.interfaces.cleaner import CleanerInterface
     from src.domain.services.interfaces.configuration import ConfigurationInterface
-    from src.domain.services.interfaces.order import OrderInterface
+    from src.domain.services.interfaces.job import JobInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
     from src.domain.services.runners.base import TaskRunner
 
@@ -37,11 +35,11 @@ if TYPE_CHECKING:
 class Container(DeclarativeContainer):
     """Контейнер зависимостей."""
 
-    cleaner_settings: Provider["CleanerSettings"] = Singleton(CleanerSettings)
     configuration_settings: Provider["ConfigurationSettings"] = Singleton(ConfigurationSettings)
+    job_settings: Provider["JobSettings"] = Singleton(JobSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
-    stream_settings: Provider["StreamSettings"] = Singleton(StreamSettings)
+    task_settings: Provider["TaskSettings"] = Singleton(TaskSettings)
 
     logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
 
@@ -56,16 +54,12 @@ class Container(DeclarativeContainer):
         _settings=kafka_settings.provided,
     )
 
-    cleaner_adapter: Provider["CleanerInterface"] = Singleton(
-        CleanerAdapter,
-        _logger=logger.provided,
-    )
     configuration_adapter: Provider["ConfigurationInterface"] = Singleton(
         ConfigurationAdapter,
         _logger=logger.provided,
     )
-    order_adapter: Provider["OrderInterface"] = Singleton(
-        OrderAdapter,
+    job_adapter: Provider["JobInterface"] = Singleton(
+        JobAdapter,
         _logger=logger.provided,
     )
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
@@ -76,28 +70,28 @@ class Container(DeclarativeContainer):
 
     assignment_runner: Provider["TaskRunner"] = Singleton(
         AssignmentRunner,
+        _jobs=job_adapter.provided,
         _logger=logger.provided,
-        _order=order_adapter.provided,
     )
     cancellation_runner: Provider["TaskRunner"] = Singleton(
         CancellationRunner,
+        _jobs=job_adapter.provided,
         _logger=logger.provided,
-        _order=order_adapter.provided,
     )
     estimation_runner: Provider["TaskRunner"] = Singleton(
         EstimationRunner,
+        _jobs=job_adapter.provided,
         _logger=logger.provided,
-        _order=order_adapter.provided,
     )
     finishing_runner: Provider["TaskRunner"] = Singleton(
         FinishingRunner,
+        _jobs=job_adapter.provided,
         _logger=logger.provided,
-        _order=order_adapter.provided,
     )
     starting_runner: Provider["TaskRunner"] = Singleton(
         StartingRunner,
+        _jobs=job_adapter.provided,
         _logger=logger.provided,
-        _order=order_adapter.provided,
     )
 
     runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(

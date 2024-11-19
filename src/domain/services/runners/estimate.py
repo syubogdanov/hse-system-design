@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from src.domain.entities.trigger import Trigger
     from src.domain.services.interfaces.configuration import ConfigurationInterface
-    from src.domain.services.interfaces.order import OrderInterface
+    from src.domain.services.interfaces.job import JobInterface
     from src.domain.services.interfaces.pricing import PricingInterface
 
 
@@ -23,8 +23,8 @@ class EstimationRunner(TaskRunner):
     """Задача оценки стоимости заказа."""
 
     _configuration: "ConfigurationInterface"
+    _jobs: "JobInterface"
     _logger: "Logger"
-    _order: "OrderInterface"
     _pricing: "PricingInterface"
 
     _task: ClassVar[TaskName] = TaskName.ESTIMATE
@@ -32,21 +32,21 @@ class EstimationRunner(TaskRunner):
     async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить задачу по триггеру."""
         if trigger.task != self._task:
-            raise ParametersError(Message.WRONG_RUNNER)
+            raise ParametersError(Message.WRONG_TASK_RUNNER)
 
-        async with self._order.lock(trigger.order_id):
-            order = await self._order.get(trigger.order_id)
+        async with self._jobs.lock(trigger.job_id):
+            job = await self._jobs.get(trigger.job_id)
 
-            if order.last_task not in self._task.get_previous():
-                raise TaskError(Message.BROKEN_TASK_ORDER)
+            if job.task not in self._task.get_previous():
+                raise TaskError(Message.WRONG_TASK_ORDER)
 
             if (configuration := await self._configuration.get()) is None:
                 raise NotFoundError(Message.CONFIGURATION_NOT_FOUND)
 
-            pricing = await self._pricing.estimate(order, configuration)
-            order.complete(self._task)
+            pricing = await self._pricing.estimate(job, configuration)
+            job.complete_task(self._task)
 
             await asyncio.gather(
-                self._order.update_or_create(order),
                 self._pricing.update_or_create(pricing),
+                self._jobs.update_or_create(job),
             )

@@ -8,9 +8,9 @@ async def actualize_configuration() -> None:
     await adapter.actualize()
 
 
-async def cleanup() -> None:
-    """Очистить устаревшие данные."""
-    adapter = CONTAINER.cleaner_adapter()
-    settings = CONTAINER.cleaner_settings()
+async def clean_jobs() -> None:
+    """Удалить устаревшие работы."""
+    adapter = CONTAINER.job_adapter()
+    settings = CONTAINER.job_settings()
 
     await adapter.clean(settings.retention)
