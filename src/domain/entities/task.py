@@ -1,6 +1,8 @@
 from enum import StrEnum, auto
 from typing import Self
 
+from utils.assertions import unreachable
+
 
 class TaskName(StrEnum):
     """Название задачи."""
@@ -28,8 +30,7 @@ class TaskName(StrEnum):
         if self == TaskName.FINISH:
             return None
 
-        detail = "This code must be unreachable"
-        raise RuntimeError(detail)
+        return unreachable()
 
     def get_previous(self: Self) -> set["TaskName"]:
         """Получить предыдущие задачи."""
@@ -48,5 +49,4 @@ class TaskName(StrEnum):
         if self == TaskName.FINISH:
             return {TaskName.ASSIGN}
 
-        detail = "This code must be unreachable"
-        raise RuntimeError(detail)
+        return unreachable()
