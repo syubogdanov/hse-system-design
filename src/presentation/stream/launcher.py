@@ -16,6 +16,4 @@ class StreamLauncher:
         consumer = CONTAINER.kafka_consumer()
         settings = CONTAINER.stream_settings()
 
-        coroutine = aiomap(process, consumer.consume(), settings.max_concurrent_tasks)
-
-        asyncio.run(coroutine)
+        asyncio.run(aiomap(process, consumer.consume(), settings.max_concurrent_tasks))
