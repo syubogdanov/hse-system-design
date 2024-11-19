@@ -28,7 +28,7 @@ class TriggerLauncher:
             self._logger.critical(Message.RUNNER_NOT_FOUND, extra={"trigger": trigger})
             raise ServiceError(Message.RUNNER_NOT_FOUND)
 
-        trigger = await runner.run(trigger)
+        await runner.run(trigger)
 
         if (next_task := trigger.task.get_next()) is not None:
             next_trigger = trigger.model_copy(update={"task": next_task})

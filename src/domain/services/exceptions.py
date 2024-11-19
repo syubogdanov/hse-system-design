@@ -7,7 +7,7 @@ class NotFoundError(ServiceError):
 
 
 class ParametersError(ServiceError):
-    """Ошибка параметров."""
+    """Ошибка параметризации."""
 
 
 class TaskError(ServiceError):

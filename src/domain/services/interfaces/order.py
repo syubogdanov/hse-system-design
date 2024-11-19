@@ -21,7 +21,7 @@ class OrderInterface(Protocol):
 
     @abstractmethod
     async def update_or_create(self: Self, order: "Order") -> None:
-        """Обновить или создать заказ."""
+        """Обновить или сохранить сущность."""
 
     @abstractmethod
     def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:

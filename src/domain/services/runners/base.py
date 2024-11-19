@@ -10,5 +10,5 @@ class TaskRunner(Protocol):
     """Интерфейс раннера задач."""
 
     @abstractmethod
-    async def run(self: Self, trigger: "Trigger") -> "Trigger":
+    async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить задачу по триггеру."""

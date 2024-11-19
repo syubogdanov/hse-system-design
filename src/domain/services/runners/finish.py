@@ -23,15 +23,15 @@ class FinishingRunner(TaskRunner):
 
     _task: ClassVar[TaskName] = TaskName.FINISH
 
-    async def run(self: Self, trigger: "Trigger") -> "Trigger":
+    async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить задачу по триггеру."""
         if trigger.task != self._task:
-            raise ParametersError(Message.WRONG_TASK)
+            raise ParametersError(Message.WRONG_RUNNER)
 
         async with self._order.lock(trigger.order_id):
             order = await self._order.get(trigger.order_id)
 
             if order.last_task not in self._task.get_previous():
-                raise TaskError(Message.BROKEN_ORDER)
+                raise TaskError(Message.BROKEN_TASK_ORDER)
 
             ...
