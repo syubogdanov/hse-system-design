@@ -22,7 +22,6 @@ async def waitmap(
     async for object_ in iterable:
         if len(tasks) >= max_concurrent_tasks:
             _, tasks = await wait(tasks, return_when=FIRST_COMPLETED)
-            continue
 
         task = create_task(function(object_))
         tasks.add(task)
