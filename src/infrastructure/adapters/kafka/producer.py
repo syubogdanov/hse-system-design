@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, SupportsBytes
 
 from aiokafka.producer import AIOKafkaProducer
 
@@ -12,17 +12,19 @@ if TYPE_CHECKING:
 
 @dataclass
 class KafkaProducerAdapter:
-    """Адаптер `Kafka`-продюсера."""
+    """Адаптер продюсера `Kafka`."""
 
     _logger: "Logger"
     _settings: "KafkaSettings"
 
-    async def produce(self: Self, message: bytes) -> None:
-        """Отправить сообщение в топик."""
-        producer = AIOKafkaProducer(
+    def __post_init__(self: Self) -> None:
+        """Дополнительная инициализация объекта."""
+        self._producer = AIOKafkaProducer(
             bootstrap_servers=self._settings.bootstrap_servers,
             client_id=self._settings.client_id,
         )
 
-        async with producer as context:
-            await context.send_and_wait(self._settings.topic_name, message)
+    async def produce(self: Self, event: SupportsBytes) -> None:
+        """Отправить сообщение в топик."""
+        async with self._producer as context:
+            await context.send_and_wait(self._settings.topic_name, bytes(event))

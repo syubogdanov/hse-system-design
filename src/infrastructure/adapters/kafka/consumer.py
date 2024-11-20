@@ -13,20 +13,22 @@ if TYPE_CHECKING:
 
 @dataclass
 class KafkaConsumerAdapter:
-    """Адаптер `Kafka`-консьюмера."""
+    """Адаптер консьюмера `Kafka`."""
 
     _logger: "Logger"
     _settings: "KafkaSettings"
 
-    async def consume(self: Self) -> AsyncIterator[bytes]:
-        """Бесконечно вычитывать сообщения из топика."""
-        consumer = AIOKafkaConsumer(
+    def __post_init__(self: Self) -> None:
+        """Дополнительная инициализация объекта."""
+        self._consumer = AIOKafkaConsumer(
             self._settings.topic_name,
             bootstrap_servers=self._settings.bootstrap_servers,
             client_id=self._settings.client_id,
             group_id=self._settings.group_id,
         )
 
-        async with consumer as context:
+    async def consume(self: Self) -> AsyncIterator[bytes]:
+        """Бесконечно вычитывать сообщения из топика."""
+        async with self._consumer as context:
             async for event in context:
                 yield event.value

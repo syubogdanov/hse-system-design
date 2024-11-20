@@ -3,45 +3,54 @@ from typing import TYPE_CHECKING
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Dict, Provider, Singleton
 
-from src.domain.entities.task import TaskName
+from src.domain.entities.stage import StageName
 from src.domain.services.launchers.trigger import TriggerLauncher
-from src.domain.services.runners.assign import AssignmentRunner
-from src.domain.services.runners.cancel import CancellationRunner
-from src.domain.services.runners.estimate import EstimationRunner
-from src.domain.services.runners.finish import FinishingRunner
-from src.domain.services.runners.start import StartingRunner
-from src.infrastructure.adapters.configuration import ConfigurationAdapter
-from src.infrastructure.adapters.job import JobAdapter
+from src.domain.services.runners.assign import AssignRunner
+from src.domain.services.runners.estimate import EstimateRunner
+from src.domain.services.runners.release import ReleaseRunner
+from src.domain.services.runners.start import StartRunner
+from src.infrastructure.adapters.config import ConfigAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
 from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+from src.infrastructure.adapters.pipeline import PipelineAdapter
+from src.infrastructure.adapters.stage import StageAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
-from src.infrastructure.settings.configuration import ConfigurationSettings
-from src.infrastructure.settings.job import JobSettings
+from src.infrastructure.logging.factory import get_logger
+from src.infrastructure.settings.config import ConfigSettings
+from src.infrastructure.settings.database import DatabaseSettings
+from src.infrastructure.settings.grpc_api import GrpcApiSettings
+from src.infrastructure.settings.http_api import HttpApiSettings
 from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
-from src.infrastructure.settings.task import TaskSettings
-from utils.logging import get_logger
+from src.infrastructure.settings.pipeline import PipelineSettings
 
 
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.services.interfaces.configuration import ConfigurationInterface
-    from src.domain.services.interfaces.job import JobInterface
+    from src.domain.services.interfaces.config import ConfigInterface
+    from src.domain.services.interfaces.pipeline import PipelineInterface
+    from src.domain.services.interfaces.stage import StageInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.runners.base import TaskRunner
+    from src.domain.services.runners.base import StageRunner
 
 
 class Container(DeclarativeContainer):
     """Контейнер зависимостей."""
 
-    configuration_settings: Provider["ConfigurationSettings"] = Singleton(ConfigurationSettings)
-    job_settings: Provider["JobSettings"] = Singleton(JobSettings)
+    config_settings: Provider["ConfigSettings"] = Singleton(ConfigSettings)
+    database_settings: Provider["DatabaseSettings"] = Singleton(DatabaseSettings)
+    grpc_api_settings: Provider["GrpcApiSettings"] = Singleton(GrpcApiSettings)
+    http_api_settings: Provider["HttpApiSettings"] = Singleton(HttpApiSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
-    task_settings: Provider["TaskSettings"] = Singleton(TaskSettings)
+    pipeline_settings: Provider["PipelineSettings"] = Singleton(PipelineSettings)
 
-    logger: Provider["Logger"] = Singleton(get_logger, level=logging_settings.provided.level)
+    logger: Provider["Logger"] = Singleton(
+        get_logger,
+        format_=logging_settings.provided.format,
+        level=logging_settings.provided.level,
+    )
 
     kafka_consumer: Provider["KafkaConsumerAdapter"] = Singleton(
         KafkaConsumerAdapter,
@@ -54,12 +63,16 @@ class Container(DeclarativeContainer):
         _settings=kafka_settings.provided,
     )
 
-    configuration_adapter: Provider["ConfigurationInterface"] = Singleton(
-        ConfigurationAdapter,
+    config_adapter: Provider["ConfigInterface"] = Singleton(
+        ConfigAdapter,
         _logger=logger.provided,
     )
-    job_adapter: Provider["JobInterface"] = Singleton(
-        JobAdapter,
+    pipeline_adapter: Provider["PipelineInterface"] = Singleton(
+        PipelineAdapter,
+        _logger=logger.provided,
+    )
+    stage_adapter: Provider["StageInterface"] = Singleton(
+        StageAdapter,
         _logger=logger.provided,
     )
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
@@ -68,39 +81,29 @@ class Container(DeclarativeContainer):
         _producer=kafka_producer.provided,
     )
 
-    assignment_runner: Provider["TaskRunner"] = Singleton(
-        AssignmentRunner,
-        _jobs=job_adapter.provided,
+    assign_runner: Provider["StageRunner"] = Singleton(
+        AssignRunner,
         _logger=logger.provided,
     )
-    cancellation_runner: Provider["TaskRunner"] = Singleton(
-        CancellationRunner,
-        _jobs=job_adapter.provided,
+    estimate_runner: Provider["StageRunner"] = Singleton(
+        EstimateRunner,
         _logger=logger.provided,
     )
-    estimation_runner: Provider["TaskRunner"] = Singleton(
-        EstimationRunner,
-        _jobs=job_adapter.provided,
+    release_runner: Provider["StageRunner"] = Singleton(
+        ReleaseRunner,
         _logger=logger.provided,
     )
-    finishing_runner: Provider["TaskRunner"] = Singleton(
-        FinishingRunner,
-        _jobs=job_adapter.provided,
-        _logger=logger.provided,
-    )
-    starting_runner: Provider["TaskRunner"] = Singleton(
-        StartingRunner,
-        _jobs=job_adapter.provided,
+    start_runner: Provider["StageRunner"] = Singleton(
+        StartRunner,
         _logger=logger.provided,
     )
 
-    runners: Provider[dict[TaskName, "TaskRunner"]] = Dict(
+    runners: Provider[dict["StageName", "StageRunner"]] = Dict(
         {
-            TaskName.ASSIGN: assignment_runner.provided,
-            TaskName.CANCEL: cancellation_runner.provided,
-            TaskName.ESTIMATE: estimation_runner.provided,
-            TaskName.FINISH: finishing_runner.provided,
-            TaskName.START: starting_runner.provided,
+            StageName.ASSIGN: assign_runner.provided,
+            StageName.ESTIMATE: estimate_runner.provided,
+            StageName.RELEASE: release_runner.provided,
+            StageName.START: start_runner.provided,
         },
     )
 
@@ -108,7 +111,8 @@ class Container(DeclarativeContainer):
         TriggerLauncher,
         _logger=logger.provided,
         _runners=runners.provided,
-        _trigger=trigger_adapter.provided,
+        _stages=stage_adapter.provided,
+        _triggers=trigger_adapter.provided,
     )
 
 

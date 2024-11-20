@@ -20,4 +20,4 @@ class TriggerAdapter(TriggerInterface):
 
     async def push(self: Self, trigger: "Trigger") -> None:
         """Отправить триггер на выполнение."""
-        await self._producer.produce(trigger.to_bytes())
+        await self._producer.produce(trigger)

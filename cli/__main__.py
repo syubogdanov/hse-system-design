@@ -2,7 +2,6 @@ from argparse import ArgumentParser
 
 from dotenv import load_dotenv
 
-from src.container import CONTAINER
 from src.presentation.crontab.launcher import CrontabLauncher
 from src.presentation.stream.launcher import StreamLauncher
 
@@ -27,22 +26,16 @@ def main() -> None:
     parser = get_parser()
     args = parser.parse_args()
 
-    logger = CONTAINER.logger()
-
     if args.start_api:
-        logger.info("Starting the API...")
         raise NotImplementedError
 
     if args.start_crontab:
-        logger.info("Starting the crontab...")
         CrontabLauncher.launch()
 
     if args.start_stream:
-        logger.info("Starting the stream...")
         StreamLauncher.launch()
 
     if args.start_grpc:
-        logger.info("Starting the gRPC...")
         raise NotImplementedError
 
 

@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class StartRunner(StageRunner):
-    """Начать выполнение пайплайна."""
+class ReleaseRunner(StageRunner):
+    """Освободить исполнителя от заказа."""
 
     _logger: "Logger"
 

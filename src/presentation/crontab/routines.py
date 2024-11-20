@@ -3,14 +3,14 @@ from src.container import CONTAINER
 
 async def actualize_configuration() -> None:
     """Актуализировать конфигурацию."""
-    adapter = CONTAINER.configuration_adapter()
+    adapter = CONTAINER.config_adapter()
 
     await adapter.actualize()
 
 
-async def clean_jobs() -> None:
-    """Удалить устаревшие работы."""
-    adapter = CONTAINER.job_adapter()
-    settings = CONTAINER.job_settings()
+async def clean_pipeline_history() -> None:
+    """Удалить устаревшие пайплайны."""
+    adapter = CONTAINER.pipeline_adapter()
+    settings = CONTAINER.pipeline_settings()
 
     await adapter.clean(settings.retention)

@@ -3,15 +3,16 @@ from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.message import Message
 from src.domain.entities.trigger import Trigger
-from src.domain.services.exceptions import ServiceError
+from src.domain.services.exceptions import DeveloperError, StageError
 
 
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.entities.task import TaskName
+    from src.domain.entities.stage import StageName
+    from src.domain.services.interfaces.stage import StageInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
-    from src.domain.services.runners.base import TaskRunner
+    from src.domain.services.runners.base import StageRunner
 
 
 @dataclass
@@ -19,16 +20,20 @@ class TriggerLauncher:
     """Лаунчер триггеров."""
 
     _logger: "Logger"
-    _runners: dict["TaskName", "TaskRunner"]
-    _trigger: "TriggerInterface"
+    _runners: dict["StageName", "StageRunner"]
+    _stages: "StageInterface"
+    _triggers: "TriggerInterface"
 
     async def launch(self: Self, trigger: Trigger) -> None:
-        """Запустить выполнение триггер-события."""
-        if (runner := self._runners.get(trigger.task)) is None:
-            raise ServiceError(Message.TASK_RUNNER_NOT_FOUND)
+        """Запустить триггер-событие."""
+        if not (runner := self._runners.get(trigger.stage_name)):
+            raise DeveloperError(Message.STAGE_RUNNER_NOT_FOUND)
 
-        await runner.run(trigger)
+        async with self._stages.lock(trigger.pipeline_id):
+            if not await runner.is_runnable(trigger):
+                raise StageError(Message.STAGE_RUNNER_NOT_RUNNABLE)
+            await runner.run(trigger)
 
-        if (next_task := trigger.task.get_next()) is not None:
-            next_trigger = trigger.model_copy(update={"task": next_task})
-            await self._trigger.push(next_trigger)
+        if (next_stage := trigger.stage_name.get_next()) and next_stage.is_schedulable():
+            next_trigger = trigger.model_copy(update={"stage_name": next_stage})
+            await self._triggers.push(next_trigger)

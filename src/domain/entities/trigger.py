@@ -3,16 +3,16 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.domain.entities.task import TaskName
+from src.domain.entities.stage import StageName
 
 
 class Trigger(BaseModel):
     """Сущность триггера."""
 
-    job_id: UUID
-    task: TaskName
+    pipeline_id: UUID
+    stage_name: StageName
 
-    def to_bytes(self: Self) -> bytes:
+    def __bytes__(self: Self) -> bytes:
         """Отобразить в `bytes`."""
         return self.model_dump_json().encode()
 

@@ -1,14 +1,14 @@
+class DeveloperError(Exception):
+    """Ошибка разработчика."""
+
+
 class ServiceError(Exception):
     """Ошибка сервиса."""
 
 
-class NotFoundError(ServiceError):
-    """Ошибка отсутствия данных."""
+class PipelineError(ServiceError):
+    """Ошибка выполнения пайплайна."""
 
 
-class ParametersError(ServiceError):
-    """Ошибка параметризации."""
-
-
-class TaskError(ServiceError):
-    """Ошибка выполнения задачи."""
+class StageError(PipelineError):
+    """Ошибка выполнения этапа."""

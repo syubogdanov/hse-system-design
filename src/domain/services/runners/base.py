@@ -6,9 +6,13 @@ if TYPE_CHECKING:
     from src.domain.entities.trigger import Trigger
 
 
-class TaskRunner(Protocol):
-    """Интерфейс раннера задач."""
+class StageRunner(Protocol):
+    """Интерфейс раннера этапов."""
 
     @abstractmethod
     async def run(self: Self, trigger: "Trigger") -> None:
-        """Запустить задачу по триггеру."""
+        """Запустить этап по триггеру."""
+
+    @abstractmethod
+    async def is_runnable(self: Self, trigger: "Trigger") -> bool:
+        """Проверить, разрешено ли запустить этап по триггеру."""
