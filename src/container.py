@@ -110,6 +110,7 @@ class Container(DeclarativeContainer):
     trigger_launcher: Provider["TriggerLauncher"] = Singleton(
         TriggerLauncher,
         _logger=logger.provided,
+        _pipelines=pipeline_adapter.provided,
         _runners=runners.provided,
         _stages=stage_adapter.provided,
         _triggers=trigger_adapter.provided,
