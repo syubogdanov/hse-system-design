@@ -1,8 +1,7 @@
 from argparse import ArgumentParser
 
-from dotenv import load_dotenv
-
 from src.presentation.crontab.launcher import CrontabLauncher
+from src.presentation.http.launcher import HttpApiLauncher
 from src.presentation.stream.launcher import StreamLauncher
 
 
@@ -21,13 +20,11 @@ def get_parser() -> ArgumentParser:
 
 def main() -> None:
     """Запустить компоненту."""
-    load_dotenv()
-
     parser = get_parser()
     args = parser.parse_args()
 
     if args.start_api:
-        raise NotImplementedError
+        HttpApiLauncher.launch()
 
     if args.start_crontab:
         CrontabLauncher.launch()
