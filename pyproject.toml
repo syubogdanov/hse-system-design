@@ -29,7 +29,6 @@ documentation = "https://github.com/syubogdanov/hse-system-design/tree/main/docs
 [tool.poetry.dependencies]
 aiocron = "^1.8"
 aiokafka = "~0.12"
-conditional-cache = "^1.2"
 dependency-injector = "^4.43"
 fastapi = "^0.115"
 pydantic = "^2.9"

@@ -3,8 +3,6 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Self
 from uuid import UUID
 
-from conditional_cache import lru_cache
-
 from src.domain.services.interfaces.pipeline import PipelineInterface
 
 
@@ -18,13 +16,8 @@ class PipelineAdapter(PipelineInterface):
 
     _logger: "Logger"
 
-    @lru_cache(condition=lambda is_canceled: is_canceled is True)
     async def is_canceled(self: Self, pipeline_id: UUID) -> bool:
-        """Проверить, отменен ли пайплайн.
-
-        Примечания:
-            * Положительные ответы кэшируются.
-        """
+        """Проверить, отменен ли пайплайн."""
         raise NotImplementedError
 
     async def clean(self: Self, retention: timedelta) -> None:

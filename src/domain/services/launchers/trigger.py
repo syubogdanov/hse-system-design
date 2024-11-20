@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.message import Message
 from src.domain.entities.trigger import Trigger
-from src.domain.services.exceptions import DeveloperError, StageError
+from src.domain.services.exceptions import DeveloperError
 
 
 if TYPE_CHECKING:
@@ -34,10 +34,6 @@ class TriggerLauncher:
         async with self._stages.lock(trigger.pipeline_id):
             if await self._pipelines.is_canceled(trigger.pipeline_id):
                 return
-
-            if not await runner.is_runnable(trigger):
-                raise StageError(Message.STAGE_RUNNER_NOT_RUNNABLE)
-
             await runner.run(trigger)
 
         if (next_stage := trigger.stage_name.get_next()) and next_stage.is_schedulable():

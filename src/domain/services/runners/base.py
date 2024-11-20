@@ -12,7 +12,3 @@ class StageRunner(Protocol):
     @abstractmethod
     async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить этап по триггеру."""
-
-    @abstractmethod
-    async def is_runnable(self: Self, trigger: "Trigger") -> bool:
-        """Проверить, разрешено ли запустить этап по триггеру."""

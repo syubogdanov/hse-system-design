@@ -19,7 +19,3 @@ class EstimateRunner(StageRunner):
     async def run(self: Self, trigger: "Trigger") -> None:
         """Запустить этап по триггеру."""
         raise NotImplementedError
-
-    async def is_runnable(self: Self, trigger: "Trigger") -> bool:
-        """Проверить, разрешено ли запустить этап по триггеру."""
-        raise NotImplementedError
