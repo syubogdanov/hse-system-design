@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from contextlib import AbstractAsyncContextManager
 from typing import TYPE_CHECKING, Protocol, Self
 from uuid import UUID
 
@@ -16,9 +15,5 @@ class StageInterface(Protocol):
         """Обновить или сохранить этап."""
 
     @abstractmethod
-    async def get_last_started(self: Self, pipeline_id: UUID) -> "Stage":
-        """Получить последний начатый этап."""
-
-    @abstractmethod
-    def lock(self: Self, pipeline_id: UUID) -> AbstractAsyncContextManager[None]:
-        """Заблокировать выполнение параллельных этапов."""
+    async def get(self: Self, stage_id: UUID) -> "Stage":
+        """Получить этап по идентификатору."""

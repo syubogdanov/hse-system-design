@@ -1,7 +1,3 @@
-class DeveloperError(Exception):
-    """Ошибка разработчика."""
-
-
 class ServiceError(Exception):
     """Ошибка сервиса."""
 

@@ -14,7 +14,6 @@ class Pipeline(BaseModel):
     order_id: UUID
     status: Status = Status.PENDING
     message: str | None = None
-    restartable: bool = False
     created_at: AwareDatetime = Field(default_factory=utcnow)
     started_at: AwareDatetime | None = None
     finished_at: AwareDatetime | None = None
@@ -29,3 +28,7 @@ class Pipeline(BaseModel):
         self.status = status
         self.message = message
         self.finished_at = utcnow()
+
+    def is_restartable(self: Self) -> bool:
+        """Проверить, можно ли перезапустить пайплайн."""
+        return self.status in {Status.CANCELED, Status.FAILED}

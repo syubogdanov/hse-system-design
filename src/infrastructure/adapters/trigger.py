@@ -7,8 +7,7 @@ from src.domain.services.interfaces.trigger import TriggerInterface
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.entities.trigger import Trigger
-    from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+    from src.domain.entities.trigger import StageTrigger
 
 
 @dataclass
@@ -16,8 +15,7 @@ class TriggerAdapter(TriggerInterface):
     """Адаптер триггер-событий."""
 
     _logger: "Logger"
-    _producer: "KafkaProducerAdapter"
 
-    async def push(self: Self, trigger: "Trigger") -> None:
+    async def push(self: Self, trigger: "StageTrigger") -> None:
         """Отправить триггер на выполнение."""
-        await self._producer.produce(trigger)
+        raise NotImplementedError

@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Protocol, Self
 
 
 if TYPE_CHECKING:
-    from src.domain.entities.trigger import Trigger
+    from src.domain.entities.stage import Stage
 
 
 class StageRunner(Protocol):
     """Интерфейс раннера этапов."""
 
     @abstractmethod
-    async def run(self: Self, trigger: "Trigger") -> None:
-        """Запустить этап по триггеру."""
+    async def run(self: Self, stage: "Stage") -> "Stage":
+        """Запустить выполнение этапа."""

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import timedelta
 from typing import TYPE_CHECKING, Self
 from uuid import UUID
 
@@ -9,6 +8,8 @@ from src.domain.services.interfaces.pipeline import PipelineInterface
 if TYPE_CHECKING:
     from logging import Logger
 
+    from src.domain.entities.pipeline import Pipeline
+
 
 @dataclass
 class PipelineAdapter(PipelineInterface):
@@ -16,10 +17,10 @@ class PipelineAdapter(PipelineInterface):
 
     _logger: "Logger"
 
-    async def is_canceled(self: Self, pipeline_id: UUID) -> bool:
-        """Проверить, отменен ли пайплайн."""
+    async def get(self: Self, pipeline_id: UUID) -> "Pipeline":
+        """Получить пайплайн по идентфикатору."""
         raise NotImplementedError
 
-    async def clean(self: Self, retention: timedelta) -> None:
-        """Удалить устаревшие пайпалайны из истории."""
+    async def update_or_create(self: Self, pipeline: "Pipeline") -> None:
+        """Обновить или сохранить пайплайн."""
         raise NotImplementedError

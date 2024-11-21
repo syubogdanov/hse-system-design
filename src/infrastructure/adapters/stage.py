@@ -1,5 +1,3 @@
-from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 from uuid import UUID
@@ -17,17 +15,12 @@ if TYPE_CHECKING:
 class StageAdapter(StageInterface):
     """Адаптер этапа."""
 
-    _logger: "Logger"
+    _logging: "Logger"
 
     async def update_or_create(self: Self, stage: "Stage") -> None:
         """Обновить или сохранить этап."""
         raise NotImplementedError
 
-    async def get_last_started(self: Self, pipeline_id: UUID) -> "Stage":
-        """Получить последний начатый этап."""
-        raise NotImplementedError
-
-    @asynccontextmanager
-    def lock(self: Self, pipeline_id: UUID) -> AsyncGenerator[None, None]:
-        """Заблокировать выполнение параллельных этапов."""
+    async def get(self: Self, stage_id: UUID) -> "Stage":
+        """Получить этап по идентификатору."""
         raise NotImplementedError

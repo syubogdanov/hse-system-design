@@ -1,17 +1,19 @@
 from typing import TYPE_CHECKING
+from uuid import UUID, uuid4
 
 from dependency_injector.containers import DeclarativeContainer
-from dependency_injector.providers import Dict, Provider, Singleton
+from dependency_injector.providers import Callable, Dict, Provider, Singleton
 
 from src.domain.entities.stage import StageName
-from src.domain.services.launchers.trigger import TriggerLauncher
-from src.domain.services.runners.assign import AssignRunner
-from src.domain.services.runners.estimate import EstimateRunner
-from src.domain.services.runners.release import ReleaseRunner
-from src.domain.services.runners.start import StartRunner
+from src.domain.services.managers.event import EventManager
+from src.domain.services.runners.assign_performer import AssignPerformerRunner
+from src.domain.services.runners.estimate_price import EstimatePriceRunner
+from src.domain.services.runners.perform_order import PerformOrderRunner
+from src.domain.services.runners.release_performer import ReleasePerformerRunner
+from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
-from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
-from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+from src.infrastructure.adapters.order import OrderAdapter
+from src.infrastructure.adapters.performer import PerformerAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
@@ -22,6 +24,7 @@ from src.infrastructure.settings.grpc_api import GrpcApiSettings
 from src.infrastructure.settings.http_api import HttpApiSettings
 from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
+from src.infrastructure.settings.order import OrderSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
 
 
@@ -29,6 +32,8 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.services.interfaces.config import ConfigInterface
+    from src.domain.services.interfaces.order import OrderInterface
+    from src.domain.services.interfaces.performer import PerformerInterface
     from src.domain.services.interfaces.pipeline import PipelineInterface
     from src.domain.services.interfaces.stage import StageInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
@@ -44,6 +49,7 @@ class Container(DeclarativeContainer):
     http_api_settings: Provider["HttpApiSettings"] = Singleton(HttpApiSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
+    order_settings: Provider["OrderSettings"] = Singleton(OrderSettings)
     pipeline_settings: Provider["PipelineSettings"] = Singleton(PipelineSettings)
 
     logger: Provider["Logger"] = Singleton(
@@ -52,19 +58,18 @@ class Container(DeclarativeContainer):
         level=logging_settings.provided.level,
     )
 
-    kafka_consumer: Provider["KafkaConsumerAdapter"] = Singleton(
-        KafkaConsumerAdapter,
-        _logger=logger.provided,
-        _settings=kafka_settings.provided,
-    )
-    kafka_producer: Provider["KafkaProducerAdapter"] = Singleton(
-        KafkaProducerAdapter,
-        _logger=logger.provided,
-        _settings=kafka_settings.provided,
-    )
+    id_factory: Provider[UUID] = Callable(uuid4)
 
     config_adapter: Provider["ConfigInterface"] = Singleton(
         ConfigAdapter,
+        _logger=logger.provided,
+    )
+    order_adapter: Provider["OrderInterface"] = Singleton(
+        OrderAdapter,
+        _logger=logger.provided,
+    )
+    performer_adapter: Provider["PerformerInterface"] = Singleton(
+        PerformerAdapter,
         _logger=logger.provided,
     )
     pipeline_adapter: Provider["PipelineInterface"] = Singleton(
@@ -78,37 +83,42 @@ class Container(DeclarativeContainer):
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
         TriggerAdapter,
         _logger=logger.provided,
-        _producer=kafka_producer.provided,
     )
 
-    assign_runner: Provider["StageRunner"] = Singleton(
-        AssignRunner,
+    assign_performer_runner: Provider["StageRunner"] = Singleton(
+        AssignPerformerRunner,
         _logger=logger.provided,
     )
-    estimate_runner: Provider["StageRunner"] = Singleton(
-        EstimateRunner,
+    estimate_price_runner: Provider["StageRunner"] = Singleton(
+        EstimatePriceRunner,
         _logger=logger.provided,
     )
-    release_runner: Provider["StageRunner"] = Singleton(
-        ReleaseRunner,
+    perform_order_runner: Provider["StageRunner"] = Singleton(
+        PerformOrderRunner,
         _logger=logger.provided,
     )
-    start_runner: Provider["StageRunner"] = Singleton(
-        StartRunner,
+    release_performer_runner: Provider["StageRunner"] = Singleton(
+        ReleasePerformerRunner,
+        _logger=logger.provided,
+    )
+    start_pipeline_runner: Provider["StageRunner"] = Singleton(
+        StartPipelineRunner,
         _logger=logger.provided,
     )
 
     runners: Provider[dict["StageName", "StageRunner"]] = Dict(
         {
-            StageName.ASSIGN: assign_runner.provided,
-            StageName.ESTIMATE: estimate_runner.provided,
-            StageName.RELEASE: release_runner.provided,
-            StageName.START: start_runner.provided,
+            StageName.ASSIGN_PERFORMER: assign_performer_runner.provided,
+            StageName.ESTIMATE_PRICE: estimate_price_runner.provided,
+            StageName.PERFORM_ORDER: perform_order_runner.provided,
+            StageName.RELEASE_PERFORMER: release_performer_runner.provided,
+            StageName.START_PIPELINE: start_pipeline_runner.provided,
         },
     )
 
-    trigger_launcher: Provider["TriggerLauncher"] = Singleton(
-        TriggerLauncher,
+    event_manager: Provider["EventManager"] = Singleton(
+        EventManager,
+        _id_factory=id_factory.provider,
         _logger=logger.provided,
         _pipelines=pipeline_adapter.provided,
         _runners=runners.provided,
