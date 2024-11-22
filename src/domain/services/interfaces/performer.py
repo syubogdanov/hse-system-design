@@ -15,5 +15,9 @@ class PerformerInterface(Protocol):
         """Получить исполнителя по идентфикатору."""
 
     @abstractmethod
+    async def get_all(self: Self) -> list["Performer"]:
+        """Получить список всех исполнителей."""
+
+    @abstractmethod
     async def update_or_create(self: Self, performer: "Performer") -> None:
         """Обновить или сохранить исполнителя."""

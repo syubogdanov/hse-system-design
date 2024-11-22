@@ -17,3 +17,7 @@ class StageInterface(Protocol):
     @abstractmethod
     async def get(self: Self, stage_id: UUID) -> "Stage":
         """Получить этап по идентификатору."""
+
+    @abstractmethod
+    async def get_all(self: Self) -> list["Stage"]:
+        """Получить список всех этапов."""

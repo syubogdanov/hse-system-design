@@ -21,6 +21,10 @@ class PerformerAdapter(PerformerInterface):
         """Получить исполнителя по идентфикатору."""
         raise NotImplementedError
 
+    async def get_all(self: Self) -> list["Performer"]:
+        """Получить список всех исполнителей."""
+        raise NotImplementedError
+
     async def update_or_create(self: Self, performer: "Performer") -> None:
         """Обновить или сохранить исполнителя."""
         raise NotImplementedError

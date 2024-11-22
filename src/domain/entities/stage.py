@@ -35,11 +35,6 @@ class StageName(StrEnum):
         """Проверить, разрешено ли отменять этап."""
         return self in {StageName.START_PIPELINE, StageName.ESTIMATE_PRICE}
 
-    @classmethod
-    def first(cls: type[Self]) -> Self:
-        """Получить название первого этапа."""
-        return cls.START_PIPELINE
-
 
 class Stage(BaseModel):
     """Сущность этапа."""
