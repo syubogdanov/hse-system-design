@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from src.presentation.http.api.v1 import factory
 
 
-TITLE: Final[str] = "HTTP API"
+TITLE: Final[str] = "Performix API"
 DOCS_URL: Final[str] = "/"
 
 

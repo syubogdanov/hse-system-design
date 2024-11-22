@@ -1,0 +1,75 @@
+services:
+
+  zookeeper:
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=${ZOOKEEPER_PORT:?}
+    healthcheck:
+      test: [ "CMD-SHELL", "echo ruok | nc -w 2 ${ZOOKEEPER_HOST:?} ${ZOOKEEPER_PORT:?}" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${ZOOKEEPER_HOST:?}
+    image: confluentinc/cp-zookeeper:7.6.1
+    restart: unless-stopped
+
+  kafka-broker:
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${KAFKA_BROKER_HOST:?}:${KAFKA_BROKER_PORT:?}
+      - KAFKA_BROKER_PORT=${KAFKA_BROKER_PORT:?}
+      - KAFKA_ZOOKEEPER_CONNECT=${ZOOKEEPER_HOST:?}:${ZOOKEEPER_PORT:?}
+    healthcheck:
+      test: kafka-topics --list --bootstrap-server localhost:${KAFKA_BROKER_PORT:?}
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${KAFKA_BROKER_HOST:?}
+    image: confluentinc/cp-kafka:7.6.1
+    restart: unless-stopped
+
+  kafka-topics:
+    command: |
+      "
+      kafka-topics --bootstrap-server ${KAFKA_BROKER_HOST:?}:${KAFKA_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_RESULT_TOPIC_NAME:?} --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server ${KAFKA_BROKER_HOST:?}:${KAFKA_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_TRIGGER_TOPIC_NAME:?} --replication-factor 1 --partitions 1
+      "
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    image: confluentinc/cp-kafka:7.6.1
+
+  kafka-ui:
+    container_name: kafka-ui
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+      kafka-topics:
+        condition: service_completed_successfully
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=${APP_NAME:?}
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${KAFKA_BROKER_HOST:?}:${KAFKA_BROKER_PORT:?}
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - ${KAFKA_UI_PORT:?}:8080
+
+  database:
+    command: >
+      -h ${DATABASE_HOST:?}
+      -p ${DATABASE_PORT:?}
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME:?}
+      - POSTGRES_USER=${DATABASE_USERNAME:?}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:?}
+    healthcheck:
+      test: pg_isready -U ${DATABASE_USERNAME:?} -d ${DATABASE_PASSWORD:?} -h ${DATABASE_HOST:?} -p ${DATABASE_PORT:?}
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${DATABASE_HOST:?}
+    image: postgres:alpine3.19
+    ports:
+      - ${DATABASE_PORT:?}:${DATABASE_PORT:?}
+    restart: unless-stopped

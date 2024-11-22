@@ -11,7 +11,7 @@ class HttpApiLauncher:
 
     @classmethod
     def launch(cls: type[Self]) -> None:
-        """Запустить поток."""
+        """Запустить `HTTP` API."""
         logger = CONTAINER.logger()
         settings = CONTAINER.http_api_settings()
 
