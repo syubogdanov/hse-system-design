@@ -10,5 +10,5 @@ class StageError(PipelineError):
     """Ошибка выполнения этапа."""
 
 
-class NotFoundError(Exception):
+class NotFoundError(ServiceError):
     """Ошибка отсутствия данных."""
