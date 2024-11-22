@@ -22,6 +22,10 @@ class PipelineAdapter(PipelineInterface):
         """Получить пайплайн по идентификатору."""
         raise NotImplementedError
 
+    async def get_all(self: Self) -> list["Pipeline"]:
+        """Получить список всех пайплайнов."""
+        raise NotImplementedError
+
     async def update_or_create(self: Self, pipeline: "Pipeline") -> None:
         """Обновить или сохранить пайплайн."""
         raise NotImplementedError

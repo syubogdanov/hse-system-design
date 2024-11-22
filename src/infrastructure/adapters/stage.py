@@ -25,6 +25,10 @@ class StageAdapter(StageInterface):
         """Получить этап по идентификатору."""
         raise NotImplementedError
 
+    async def get_all(self: Self, *, pipeline_id: UUID | None = None) -> list["Stage"]:
+        """Получить список всех этапов."""
+        raise NotImplementedError
+
     async def get_latest(self: Self, pipeline_id: UUID) -> "Stage | None":
         """Получить последний запущенный этап."""
         raise NotImplementedError

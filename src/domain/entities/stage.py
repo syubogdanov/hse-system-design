@@ -21,7 +21,7 @@ class StageName(StrEnum):
     PERFORM_ORDER = auto()
     RELEASE_PERFORMER = auto()
 
-    def get_next(self: Self) -> "StageName":
+    def get_next(self: Self) -> "StageName | None":
         """Получить название следующего этапа."""
         stages = list(StageName)
         index = stages.index(self) + 1

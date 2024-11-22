@@ -13,6 +13,7 @@ from src.domain.services.runners.perform_order import PerformOrderRunner
 from src.domain.services.runners.release_performer import ReleasePerformerRunner
 from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
+from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.services.interfaces.config import ConfigInterface
+    from src.domain.services.interfaces.order import OrderInterface
     from src.domain.services.interfaces.pipeline import PipelineInterface
     from src.domain.services.interfaces.stage import StageInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
@@ -57,6 +59,10 @@ class Container(DeclarativeContainer):
 
     config_adapter: Provider["ConfigInterface"] = Singleton(
         ConfigAdapter,
+        _logger=logger.provided,
+    )
+    order_adapter: Provider["OrderInterface"] = Singleton(
+        OrderAdapter,
         _logger=logger.provided,
     )
     pipeline_adapter: Provider["PipelineInterface"] = Singleton(

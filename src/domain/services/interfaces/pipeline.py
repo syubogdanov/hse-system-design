@@ -16,6 +16,10 @@ class PipelineInterface(Protocol):
         """Получить пайплайн по идентификатору."""
 
     @abstractmethod
+    async def get_all(self: Self) -> list["Pipeline"]:
+        """Получить список всех пайплайнов."""
+
+    @abstractmethod
     async def update_or_create(self: Self, pipeline: "Pipeline") -> None:
         """Обновить или сохранить пайплайн."""
 
