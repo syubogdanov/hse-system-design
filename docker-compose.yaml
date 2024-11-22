@@ -1,0 +1,62 @@
+services:
+
+  database:
+    command: -h ${DATABASE_HOST:?} -p ${DATABASE_PORT:?}
+    container_name: database
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME:?}
+      - POSTGRES_USER=${DATABASE_USERNAME:?}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:?}
+    healthcheck:
+      test: pg_isready -U ${DATABASE_USERNAME:?} -d ${DATABASE_PASSWORD:?} -h ${DATABASE_HOST:?} -p ${DATABASE_PORT:?}
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${DATABASE_HOST:?}
+    image: postgres:alpine3.19
+    ports:
+      - ${DATABASE_PORT:?}:${DATABASE_PORT:?}
+    restart: unless-stopped
+
+  zookeeper:
+    container_name: zookeeper
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=${KAAS_ZOOKEEPER_PORT:?}
+    healthcheck:
+      test: [ "CMD-SHELL", "echo ruok | nc -w 2 localhost ${KAAS_ZOOKEEPER_PORT:?}" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${KAAS_ZOOKEEPER_HOST:?}
+    image: confluentinc/cp-zookeeper:7.6.1
+    restart: unless-stopped
+
+  kafka:
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
+      - KAFKA_BROKER_PORT=${KAAS_BROKER_PORT:?}
+      - KAFKA_ZOOKEEPER_CONNECT=${KAAS_ZOOKEEPER_HOST:?}:${KAAS_ZOOKEEPER_PORT:?}
+    healthcheck:
+      test: kafka-topics --list --bootstrap-server localhost:${KAAS_BROKER_PORT:?}
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${KAAS_BROKER_HOST:?}
+    image: confluentinc/cp-kafka:7.6.1
+    restart: unless-stopped
+
+  topics:
+    command: |
+      "
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_RESULT_TOPIC_NAME:?} --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_TRIGGER_TOPIC_NAME:?} --replication-factor 1 --partitions 1
+      "
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    image: confluentinc/cp-kafka:7.6.1
