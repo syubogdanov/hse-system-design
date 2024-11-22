@@ -1,7 +1,7 @@
 from typing import Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel
+from pydantic import AwareDatetime, BaseModel, Field
 
 from src.domain.entities.status import Status
 from utils.datetime import utcnow
@@ -14,6 +14,7 @@ class Pipeline(BaseModel):
     order_id: UUID
     status: Status = Status.PENDING
     message: str | None = None
+    created_at: AwareDatetime = Field(default_factory=utcnow)
     started_at: AwareDatetime | None = None
     finished_at: AwareDatetime | None = None
 

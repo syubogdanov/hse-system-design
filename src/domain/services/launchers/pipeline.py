@@ -1,5 +1,3 @@
-import asyncio
-
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
@@ -9,7 +7,7 @@ from src.domain.entities.pipeline import Pipeline
 from src.domain.entities.stage import StageName
 from src.domain.entities.status import Status
 from src.domain.entities.trigger import Trigger
-from src.domain.services.exceptions import PipelineError
+from src.domain.services.exceptions import NotFoundError, PipelineError, StageError
 
 
 if TYPE_CHECKING:
@@ -56,13 +54,17 @@ class PipelineLauncher:
 
             if not pipeline:
                 detail = "No pipelines have been launched yet"
-                raise PipelineError(detail, order_id)
+                raise NotFoundError(detail, order_id)
 
             if pipeline.status.is_final():
                 detail = "The pipeline has already been finished"
                 raise PipelineError(detail, pipeline)
 
             stage = await self._stages.get_latest(pipeline.id)
+
+            if stage and not stage.name.is_cancelable():
+                detail = "The current stage is not cancelable"
+                raise StageError(detail, stage)
 
             if stage and not stage.status.is_final():
                 stage.finish(Status.CANCELED)
