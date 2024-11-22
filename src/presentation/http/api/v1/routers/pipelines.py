@@ -41,26 +41,6 @@ async def get_stages(pipeline_id: Annotated[UUID, Path(alias="id")]) -> list[Sta
     return await adapter.get_all(pipeline_id=pipeline_id)
 
 
-@router.post("/{id}/cancel")
-async def cancel(pipeline_id: Annotated[UUID, Path(alias="id")]) -> None:
-    """Отменить пайплайн."""
-    adapter = CONTAINER.pipeline_adapter()
-    launcher = CONTAINER.pipeline_launcher()
-
-    pipeline = await adapter.get(pipeline_id)
-    await launcher.cancel(pipeline.order_id)
-
-
-@router.post("/{id}/restart", status_code=HTTPStatus.ACCEPTED)
-async def restart(pipeline_id: Annotated[UUID, Path(alias="id")]) -> UUID:
-    """Перезапустить пайплайн."""
-    adapter = CONTAINER.pipeline_adapter()
-    launcher = CONTAINER.pipeline_launcher()
-
-    pipeline = await adapter.get(pipeline_id)
-    return await launcher.start(pipeline.order_id)
-
-
 @router.post("/start", status_code=HTTPStatus.ACCEPTED)
 async def start(parameters: OrderParameters) -> UUID:
     """Начать пайплайн."""
