@@ -7,7 +7,7 @@ from src.presentation.http.api.v1 import factory
 from src.presentation.http.handlers import on_not_found_error, on_pipeline_error, on_stage_error
 
 
-TITLE: Final[str] = "Performix API"
+TITLE: Final[str] = "Sorting Hat API"
 DOCS_URL: Final[str] = "/"
 
 
