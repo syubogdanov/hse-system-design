@@ -1,10 +1,10 @@
-APP-NAME = performix
+APP-NAME = sorting-hat
 APP-VERSION = 1.0.0
 
 PYTHON = python -B
 
 # Компоненты
-http:
+http-api:
 	$(PYTHON) -m cli --start-http-api
 
 crontab:
@@ -13,8 +13,14 @@ crontab:
 stream:
 	$(PYTHON) -m cli --start-stream
 
-grpc:
+grpc-api:
 	$(PYTHON) -m cli --start-grpc-api
+
+# Контейнеризация
+docker:
+	docker build --tag $(APP-NAME):$(APP-VERSION) .
+	docker compose down --remove-orphans
+	docker compose up --build --force-recreate --remove-orphans
 
 # Линтеры
 lint: ruff mypy
@@ -24,9 +30,3 @@ mypy:
 
 ruff:
 	$(PYTHON) -m ruff check .
-
-# Docker
-docker-compose:
-	docker build --tag $(APP-NAME):$(APP-VERSION) .
-	docker compose down --remove-orphans
-	docker compose up --build --force-recreate --remove-orphans

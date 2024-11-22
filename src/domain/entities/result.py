@@ -5,7 +5,7 @@ from utils.kafka import Event
 from utils.typing import JSON
 
 
-class StageResult(Event):
+class Result(Event):
     """Сущность результата."""
 
     stage_id: UUID

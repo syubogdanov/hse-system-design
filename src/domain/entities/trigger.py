@@ -4,7 +4,7 @@ from src.domain.entities.stage import StageName
 from utils.kafka import Event
 
 
-class StageTrigger(Event):
+class Trigger(Event):
     """Сущность триггера."""
 
     pipeline_id: UUID

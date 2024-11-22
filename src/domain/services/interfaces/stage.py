@@ -19,5 +19,5 @@ class StageInterface(Protocol):
         """Получить этап по идентификатору."""
 
     @abstractmethod
-    async def get_all(self: Self) -> list["Stage"]:
-        """Получить список всех этапов."""
+    async def get_latest(self: Self, pipeline_id: UUID) -> "Stage | None":
+        """Получить последний запущенный этап."""
