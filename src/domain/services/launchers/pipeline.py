@@ -28,7 +28,7 @@ class PipelineLauncher:
     _stages: "StageInterface"
     _triggers: "TriggerInterface"
 
-    async def start(self: Self, order_id: UUID) -> None:
+    async def start(self: Self, order_id: UUID) -> UUID:
         """Начать выполнение пайплайна по заказу."""
         async with self._pipelines.lock(order_id):
             latest = await self._pipelines.get_latest(order_id)
@@ -46,6 +46,8 @@ class PipelineLauncher:
 
             trigger = Trigger(pipeline_id=pipeline.id, stage_name=StageName.first())
             await self._triggers.push(trigger)
+
+            return pipeline.id
 
     async def cancel(self: Self, order_id: UUID) -> None:
         """Отменить выполнение пайплайна по заказу."""
