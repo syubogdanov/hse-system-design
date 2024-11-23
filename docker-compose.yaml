@@ -108,3 +108,26 @@ services:
       - DATABASE_USERNAME=${DATABASE_USERNAME:?}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
     restart: unless-stopped
+
+  stream:
+    build: ./
+    command: --start-stream
+    container_name: stream
+    depends_on:
+      database:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      topics:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST:?}
+      - DATABASE_PORT=${DATABASE_PORT:?}
+      - DATABASE_NAME=${DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID:?}
+      - KAFKA_RESULT_TOPIC_NAME=${KAFKA_RESULT_TOPIC_NAME:?}
+      - KAFKA_TRIGGER_TOPIC_NAME=${KAFKA_TRIGGER_TOPIC_NAME:?}
+    restart: unless-stopped
