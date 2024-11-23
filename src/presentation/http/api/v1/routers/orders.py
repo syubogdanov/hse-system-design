@@ -30,7 +30,7 @@ async def get_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -> Pi
 
 @router.get("/{id}/pipelines")
 async def get_pipelines(order_id: Annotated[UUID, Path(alias="id")]) -> list[Pipeline]:
-    """Получить актуальный пайплайн."""
+    """Получить список пайплайнов заказа."""
     adapter = CONTAINER.pipeline_adapter()
 
     return await adapter.get_all(order_id=order_id)

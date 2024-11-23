@@ -58,7 +58,7 @@ class StageLauncher:
                 await self._push_next_or_finish(stage)
 
     async def resume(self: Self, result: "Result") -> None:
-        """Перезапустить выполнение пайплайна по заказу."""
+        """Продолжить выполнение пайплайна по заказу."""
         stage = await self._stages.get(result.stage_id)
         pipeline = await self._pipelines.get(stage.pipeline_id)
 
