@@ -25,6 +25,7 @@ from src.infrastructure.settings.grpc_api import GrpcApiSettings
 from src.infrastructure.settings.http_api import HttpApiSettings
 from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
+from src.infrastructure.settings.order import OrderSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
 
 
@@ -49,6 +50,7 @@ class Container(DeclarativeContainer):
     http_api_settings: Provider["HttpApiSettings"] = Singleton(HttpApiSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
+    order_settings: Provider["OrderSettings"] = Singleton(OrderSettings)
     pipeline_settings: Provider["PipelineSettings"] = Singleton(PipelineSettings)
 
     logger: Provider["Logger"] = Singleton(

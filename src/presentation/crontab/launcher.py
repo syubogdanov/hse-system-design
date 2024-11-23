@@ -3,7 +3,7 @@ from asyncio.events import get_event_loop
 from aiocron import crontab
 
 from src.container import CONTAINER
-from src.presentation.crontab.routines import actualize_config
+from src.presentation.crontab.routines import actualize_config, clean_order_history
 
 
 class CrontabLauncher:
@@ -15,10 +15,12 @@ class CrontabLauncher:
         logger = CONTAINER.logger()
 
         config_settings = CONTAINER.config_settings()
+        order_settings = CONTAINER.order_settings()
 
         loop = get_event_loop()
 
         crontab(config_settings.crontab, actualize_config, loop=loop)
+        crontab(order_settings.crontab, clean_order_history, loop=loop)
 
         logger.info("Starting the crontab...")
 

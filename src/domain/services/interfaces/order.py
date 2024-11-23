@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from datetime import timedelta
 from typing import TYPE_CHECKING, Protocol, Self
 
 
@@ -12,3 +13,7 @@ class OrderInterface(Protocol):
     @abstractmethod
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
         """Зарегистрировать заказ."""
+
+    @abstractmethod
+    async def clean(self: Self, retention: timedelta) -> None:
+        """Очистить устаревшие данные."""
