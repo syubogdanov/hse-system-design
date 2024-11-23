@@ -60,3 +60,36 @@ services:
         condition: service_healthy
     entrypoint: [ "/bin/sh", "-c" ]
     image: confluentinc/cp-kafka:7.6.1
+
+  http-api:
+    build: ./
+    command: --start-http-api
+    container_name: http-api
+    depends_on:
+      database:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      topics:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST:?}
+      - DATABASE_PORT=${DATABASE_PORT:?}
+      - DATABASE_NAME=${DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+      - HTTP_API_HOST=${HTTP_API_HOST:?}
+      - HTTP_API_PORT=${HTTP_API_PORT:?}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID:?}
+      - KAFKA_RESULT_TOPIC_NAME=${KAFKA_RESULT_TOPIC_NAME:?}
+      - KAFKA_TRIGGER_TOPIC_NAME=${KAFKA_TRIGGER_TOPIC_NAME:?}
+    healthcheck:
+      test: curl --fail http://${HTTP_API_HOST:?}:${HTTP_API_PORT:?}/api/v1/healthcheck
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${HTTP_API_HOST:?}
+    ports:
+      - ${HTTP_API_PORT:?}:${HTTP_API_PORT:?}
+    restart: unless-stopped

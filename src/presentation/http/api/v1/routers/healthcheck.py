@@ -10,6 +10,6 @@ PREFIX: Final[str] = f"/{TAG}"
 router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
-@router.get("/healthcheck")
+@router.get("")
 async def healthcheck() -> None:
     """Проверить, что сервис активен."""

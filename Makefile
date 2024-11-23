@@ -1,6 +1,3 @@
-APP-NAME = sorting-hat
-APP-VERSION = 1.0.0
-
 PYTHON = python -B
 
 # Компоненты
@@ -18,7 +15,6 @@ grpc-api:
 
 # Контейнеризация
 docker:
-	docker build --tag $(APP-NAME):$(APP-VERSION) .
 	docker compose down --remove-orphans
 	docker compose up --build --force-recreate --remove-orphans
 
