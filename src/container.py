@@ -18,6 +18,7 @@ from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
 from src.infrastructure.logging.factory import create_logger
+from src.infrastructure.settings.app import AppSettings
 from src.infrastructure.settings.config import ConfigSettings
 from src.infrastructure.settings.database import DatabaseSettings
 from src.infrastructure.settings.grpc_api import GrpcApiSettings
@@ -41,6 +42,7 @@ if TYPE_CHECKING:
 class Container(DeclarativeContainer):
     """Контейнер зависимостей."""
 
+    app_settings: Provider["AppSettings"] = Singleton(AppSettings)
     config_settings: Provider["ConfigSettings"] = Singleton(ConfigSettings)
     database_settings: Provider["DatabaseSettings"] = Singleton(DatabaseSettings)
     grpc_api_settings: Provider["GrpcApiSettings"] = Singleton(GrpcApiSettings)
