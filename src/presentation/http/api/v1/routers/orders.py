@@ -37,7 +37,7 @@ async def get_pipelines(order_id: Annotated[UUID, Path(alias="id")]) -> Pipeline
 
 
 @router.post("/register", status_code=HTTPStatus.ACCEPTED)
-async def start(parameters: OrderParameters) -> UUID:
+async def register(parameters: OrderParameters) -> UUID:
     """Зарегистрировать заказ и начать пайплайн."""
     adapter = CONTAINER.order_adapter()
     launcher = CONTAINER.pipeline_launcher()
@@ -50,7 +50,7 @@ async def start(parameters: OrderParameters) -> UUID:
 
 
 @router.post("/{id}/pipelines/latest/cancel")
-async def cancel(order_id: Annotated[UUID, Path(alias="id")]) -> None:
+async def cancel_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -> None:
     """Отменить пайплайн."""
     launcher = CONTAINER.pipeline_launcher()
 
@@ -58,7 +58,7 @@ async def cancel(order_id: Annotated[UUID, Path(alias="id")]) -> None:
 
 
 @router.post("/{id}/pipelines/latest/restart", status_code=HTTPStatus.ACCEPTED)
-async def restart(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
+async def restart_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
     """Перезапустить пайплайн."""
     launcher = CONTAINER.pipeline_launcher()
 
