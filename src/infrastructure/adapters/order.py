@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import TYPE_CHECKING, Self
 
 from src.domain.services.interfaces.order import OrderInterface
@@ -18,4 +19,8 @@ class OrderAdapter(OrderInterface):
 
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
         """Зарегистрировать заказ."""
+        raise NotImplementedError
+
+    async def clean(self: Self, retention: timedelta) -> None:
+        """Очистить устаревшие данные."""
         raise NotImplementedError

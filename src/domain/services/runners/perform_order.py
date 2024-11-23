@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.entities.stage import Stage
+    from src.domain.services.interfaces.stage import StageInterface
 
 
 @dataclass
@@ -15,7 +16,11 @@ class PerformOrderRunner(StageRunner):
     """Начать выполнение заказа."""
 
     _logger: "Logger"
+    _stages: "StageInterface"
 
     async def run(self: Self, stage: "Stage") -> "Stage":
         """Запустить выполнение этапа."""
-        raise NotImplementedError
+        stage.start()
+        await self._stages.update_or_create(stage)
+
+        return stage
