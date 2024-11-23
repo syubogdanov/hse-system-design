@@ -93,6 +93,7 @@ class Container(DeclarativeContainer):
     perform_order_runner: Provider["StageRunner"] = Singleton(
         PerformOrderRunner,
         _logger=logger.provided,
+        _stages=stage_adapter.provided,
     )
     release_performer_runner: Provider["StageRunner"] = Singleton(
         ReleasePerformerRunner,
