@@ -16,7 +16,7 @@ class PipelineInterface(Protocol):
         """Получить пайплайн по идентификатору."""
 
     @abstractmethod
-    async def get_all(self: Self) -> list["Pipeline"]:
+    async def get_all(self: Self, *, order_id: UUID | None = None) -> list["Pipeline"]:
         """Получить список всех пайплайнов."""
 
     @abstractmethod

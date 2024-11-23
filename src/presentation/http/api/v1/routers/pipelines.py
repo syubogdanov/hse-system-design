@@ -1,11 +1,9 @@
-from http import HTTPStatus
 from typing import Annotated, Final
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Path
 
 from src.container import CONTAINER
-from src.domain.entities.order import OrderParameters
 from src.domain.entities.pipeline import Pipeline
 from src.domain.entities.stage import Stage
 
@@ -18,11 +16,11 @@ router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
 @router.get("")
-async def get_all() -> list[Pipeline]:
+async def get_all(order_id: UUID | None = None) -> list[Pipeline]:
     """Получить список всех пайплайнов."""
     adapter = CONTAINER.pipeline_adapter()
 
-    return await adapter.get_all()
+    return await adapter.get_all(order_id=order_id)
 
 
 @router.get("/{id}")
@@ -39,16 +37,3 @@ async def get_stages(pipeline_id: Annotated[UUID, Path(alias="id")]) -> list[Sta
     adapter = CONTAINER.stage_adapter()
 
     return await adapter.get_all(pipeline_id=pipeline_id)
-
-
-@router.post("/start", status_code=HTTPStatus.ACCEPTED)
-async def start(parameters: OrderParameters) -> UUID:
-    """Начать пайплайн."""
-    adapter = CONTAINER.order_adapter()
-    launcher = CONTAINER.pipeline_launcher()
-
-    if not (order := await adapter.register(parameters)):
-        detail = "The order has already been registered"
-        raise HTTPException(HTTPStatus.CONFLICT, detail)
-
-    return await launcher.start(order.id)

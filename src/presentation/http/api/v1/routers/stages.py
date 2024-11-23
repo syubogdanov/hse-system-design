@@ -15,11 +15,11 @@ router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
 @router.get("")
-async def get_all() -> list[Stage]:
+async def get_all(pipeline_id: UUID | None = None) -> list[Stage]:
     """Получить список всех этапов."""
     adapter = CONTAINER.stage_adapter()
 
-    return await adapter.get_all()
+    return await adapter.get_all(pipeline_id=pipeline_id)
 
 
 @router.get("/{id}")

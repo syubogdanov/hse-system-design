@@ -22,7 +22,7 @@ class PipelineAdapter(PipelineInterface):
         """Получить пайплайн по идентификатору."""
         raise NotImplementedError
 
-    async def get_all(self: Self) -> list["Pipeline"]:
+    async def get_all(self: Self, *, order_id: UUID | None = None) -> list["Pipeline"]:
         """Получить список всех пайплайнов."""
         raise NotImplementedError
 
