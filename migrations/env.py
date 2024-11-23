@@ -1,6 +1,7 @@
 import asyncio
 
 from logging.config import fileConfig
+from typing import TYPE_CHECKING
 
 from alembic import context
 from sqlalchemy import pool
@@ -9,12 +10,30 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.infrastructure.models import *  # noqa: F403
 from src.infrastructure.models.base import BaseModel
+from src.infrastructure.settings.database import DatabaseSettings
 
 
-config = context.config
+if TYPE_CHECKING:
+    from alembic.config import Config
 
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+
+def get_settings() -> "DatabaseSettings":
+    """Получить настройки БД."""
+    return DatabaseSettings()
+
+
+def get_config() -> "Config":
+    """Получить конфиг."""
+    config = context.config
+
+    if config.config_file_name:
+        fileConfig(config.config_file_name)
+
+    settings = get_settings()
+
+    config.set_main_option("sqlalchemy.url", settings.url)
+
+    return config
 
 
 def run_migrations(connection: Connection) -> None:
@@ -27,6 +46,8 @@ def run_migrations(connection: Connection) -> None:
 
 async def run_async_migrations() -> None:
     """Накатить миграции [асинхронно]."""
+    config = get_config()
+
     engine = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
