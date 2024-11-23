@@ -1,10 +1,12 @@
 import tomllib
 
-from pathlib import Path
+from utils.basedir import BASEDIR
 
 
 def get_version() -> str:
     """Получить версию проекта."""
-    with Path("pyproject.toml").open(mode="rb") as file:
-        data = tomllib.load(file)
-        return data["tool"]["poetry"]["version"]
+    path = BASEDIR / "pyproject.toml"
+
+    with path.open(mode="rb") as file:
+        pyproject = tomllib.load(file)
+        return pyproject["tool"]["poetry"]["version"]

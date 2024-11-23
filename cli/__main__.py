@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from src.presentation.crontab.launcher import CrontabLauncher
 from src.presentation.grpc.launcher import GrpcApiLauncher
 from src.presentation.http.launcher import HttpApiLauncher
+from src.presentation.migrations.launcher import MigrationsLauncher
 from src.presentation.stream.launcher import StreamLauncher
 
 
@@ -15,6 +16,7 @@ def get_parser() -> ArgumentParser:
     group.add_argument("--start-crontab", action="store_true")
     group.add_argument("--start-stream", action="store_true")
     group.add_argument("--start-grpc-api", action="store_true")
+    group.add_argument("--start-migrations", action="store_true")
 
     return parser
 
@@ -35,6 +37,9 @@ def main() -> None:
 
     if args.start_grpc_api:
         GrpcApiLauncher.launch()
+
+    if args.start_migrations:
+        MigrationsLauncher.launch()
 
 
 if __name__ == "__main__":
