@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol, Self
+from typing import TYPE_CHECKING, Self
+
+from src.domain.services.interfaces.config import ConfigInterface
 
 
 if TYPE_CHECKING:
@@ -7,7 +9,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class ConfigAdapter(Protocol):
+class ConfigAdapter(ConfigInterface):
     """Адаптер конфигурации."""
 
     _logger: "Logger"

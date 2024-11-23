@@ -93,3 +93,18 @@ services:
     ports:
       - ${HTTP_API_PORT:?}:${HTTP_API_PORT:?}
     restart: unless-stopped
+
+  crontab:
+    build: ./
+    command: --start-crontab
+    container_name: crontab
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST:?}
+      - DATABASE_PORT=${DATABASE_PORT:?}
+      - DATABASE_NAME=${DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+    restart: unless-stopped
