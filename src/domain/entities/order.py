@@ -9,14 +9,14 @@ class OrderParameters(BaseModel):
     """Сущность параметров заказа."""
 
     id: UUID
-    source_address: UUID
-    target_address: UUID
+    source_address_id: UUID
+    target_address_id: UUID
 
 
 class Order(BaseModel):
     """Сущность заказа."""
 
     id: UUID
-    source_address: UUID
-    target_address: UUID
+    source_address_id: UUID
+    target_address_id: UUID
     registered_at: AwareDatetime = Field(default_factory=utcnow)
