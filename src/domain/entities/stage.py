@@ -9,11 +9,7 @@ from utils.datetime import utcnow
 
 
 class StageName(StrEnum):
-    """Название этапа.
-
-    Примечания:
-        * Порядок объявления влияет на очередность этапов.
-    """
+    """Название этапа."""
 
     START_PIPELINE = auto()
     ESTIMATE_PRICE = auto()
@@ -23,9 +19,13 @@ class StageName(StrEnum):
 
     def get_next(self: Self) -> "StageName | None":
         """Получить название следующего этапа."""
-        stages = list(StageName)
-        index = stages.index(self) + 1
-        return StageName(stages[index]) if index < len(stages) else None
+        next_stages = {
+            StageName.START_PIPELINE: StageName.ESTIMATE_PRICE,
+            StageName.ESTIMATE_PRICE: StageName.ASSIGN_PERFORMER,
+            StageName.ASSIGN_PERFORMER: StageName.PERFORM_ORDER,
+            StageName.PERFORM_ORDER: StageName.RELEASE_PERFORMER,
+        }
+        return next_stages.get(self)
 
     def is_cancelable(self: Self) -> bool:
         """Проверить, разрешена ли отмена этапа."""
@@ -34,7 +34,7 @@ class StageName(StrEnum):
     @staticmethod
     def first() -> "StageName":
         """Получить название первого этапа."""
-        raise NotImplementedError
+        return StageName.START_PIPELINE
 
 
 class Stage(BaseModel):
