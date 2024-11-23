@@ -101,6 +101,8 @@ class Container(DeclarativeContainer):
     start_pipeline_runner: Provider["StageRunner"] = Singleton(
         StartPipelineRunner,
         _logger=logger.provided,
+        _pipelines=pipeline_adapter.provided,
+        _stages=stage_adapter.provided,
     )
 
     runners: Provider[dict["StageName", "StageRunner"]] = Dict(
