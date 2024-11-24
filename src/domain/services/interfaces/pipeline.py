@@ -25,7 +25,7 @@ class PipelineInterface(Protocol):
 
     @abstractmethod
     async def get_latest(self: Self, order_id: UUID) -> "Pipeline | None":
-        """Получить последний запущенный пайплайн."""
+        """Получить последний созданный пайплайн."""
 
     @abstractmethod
     def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:

@@ -24,4 +24,4 @@ class StageInterface(Protocol):
 
     @abstractmethod
     async def get_latest(self: Self, pipeline_id: UUID) -> "Stage | None":
-        """Получить последний запущенный этап."""
+        """Получить последний созданный этап."""

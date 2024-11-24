@@ -1,8 +1,11 @@
+from contextlib import AbstractAsyncContextManager
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Callable, Dict, Provider, Singleton
+from sqlalchemy.ext.asyncio.engine import create_async_engine
+from sqlalchemy.ext.asyncio.session import async_sessionmaker
 
 from src.domain.entities.stage import StageName
 from src.domain.services.launchers.pipeline import PipelineLauncher
@@ -36,6 +39,9 @@ from src.infrastructure.settings.topic_name import TopicNameSettings
 if TYPE_CHECKING:
     from logging import Logger
 
+    from sqlalchemy.ext.asyncio.engine import AsyncEngine
+    from sqlalchemy.ext.asyncio.session import AsyncSession
+
     from src.domain.services.interfaces.config import ConfigInterface
     from src.domain.services.interfaces.delivery import DeliveryInterface
     from src.domain.services.interfaces.order import OrderInterface
@@ -67,6 +73,21 @@ class Container(DeclarativeContainer):
 
     id_factory: Provider[UUID] = Callable(uuid4)
 
+    engine: Provider["AsyncEngine"] = Singleton(
+        create_async_engine,
+        url=database_settings.provided.url,
+    )
+    session_maker: Provider["async_sessionmaker"] = Singleton(
+        async_sessionmaker,
+        bind=engine.provided,
+        autoflush=database_settings.provided.autoflush,
+        autocommit=database_settings.provided.autocommit,
+        expire_on_commit=database_settings.provided.expire_on_commit,
+    )
+    session_factory: Provider[AbstractAsyncContextManager["AsyncSession"]] = Callable(
+        session_maker.provided.begin,
+    )
+
     kafka_consumer_adapter: Provider["KafkaConsumerAdapter"] = Singleton(
         KafkaConsumerAdapter,
         _logger=logger.provided,
@@ -93,6 +114,7 @@ class Container(DeclarativeContainer):
     pipeline_adapter: Provider["PipelineInterface"] = Singleton(
         PipelineAdapter,
         _logger=logger.provided,
+        _session_factory=session_factory.provided,
     )
     stage_adapter: Provider["StageInterface"] = Singleton(
         StageAdapter,

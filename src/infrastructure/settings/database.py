@@ -24,6 +24,13 @@ class DatabaseSettings(BaseSettings):
     # Драйвер для подключения.
     driver: str = "asyncpg"
 
+    # Автоматически подтверждать транзакции.
+    autocommit: bool = False
+    # Автоматически отправлять запросы.
+    autoflush: bool = False
+    # Обновлять объект после фиксации транзакции.
+    expire_on_commit: bool = False
+
     @property
     def url(self: Self) -> str:
         """URL для подключения к БД."""
