@@ -71,8 +71,8 @@ services:
   topics:
     command: |
       "
-      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_RESULT_TOPIC_NAME:?} --replication-factor 1 --partitions 1
-      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${KAFKA_TRIGGER_TOPIC_NAME:?} --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_RESULTS:?} --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_TRIGGERS:?} --replication-factor 1 --partitions 1
       "
     container_name: topics
     depends_on:
@@ -118,8 +118,8 @@ services:
       - HTTP_API_PORT=${HTTP_API_PORT:?}
       - KAFKA_BOOTSTRAP_SERVERS=${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
       - KAFKA_GROUP_ID=${KAFKA_GROUP_ID:?}
-      - KAFKA_RESULT_TOPIC_NAME=${KAFKA_RESULT_TOPIC_NAME:?}
-      - KAFKA_TRIGGER_TOPIC_NAME=${KAFKA_TRIGGER_TOPIC_NAME:?}
+      - TOPIC_NAME_RESULTS=${TOPIC_NAME_RESULTS:?}
+      - TOPIC_NAME_TRIGGERS=${TOPIC_NAME_TRIGGERS:?}
     healthcheck:
       test: curl --fail http://${HTTP_API_HOST:?}:${HTTP_API_PORT:?}/api/v1/healthcheck
       interval: 5s
@@ -168,6 +168,6 @@ services:
       - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
       - KAFKA_BOOTSTRAP_SERVERS=${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
       - KAFKA_GROUP_ID=${KAFKA_GROUP_ID:?}
-      - KAFKA_RESULT_TOPIC_NAME=${KAFKA_RESULT_TOPIC_NAME:?}
-      - KAFKA_TRIGGER_TOPIC_NAME=${KAFKA_TRIGGER_TOPIC_NAME:?}
+      - TOPIC_NAME_RESULTS=${TOPIC_NAME_RESULTS:?}
+      - TOPIC_NAME_TRIGGERS=${TOPIC_NAME_TRIGGERS:?}
     restart: unless-stopped
