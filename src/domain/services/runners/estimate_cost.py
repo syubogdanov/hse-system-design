@@ -1,7 +1,7 @@
 import asyncio
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, ClassVar, Self
 
 from src.domain.entities.status import Status
 from src.domain.services.exceptions import ExternalServiceError
@@ -32,6 +32,8 @@ class EstimateCostRunner(StageRunner):
     _pipelines: "PipelineInterface"
     _stages: "StageInterface"
 
+    _precision: ClassVar[int] = 2
+
     async def run(self: Self, stage: "Stage") -> "Stage":
         """Запустить выполнение этапа."""
         stage.start()
@@ -59,11 +61,11 @@ class EstimateCostRunner(StageRunner):
             message = "Information on the geography of the order could not be obtained"
             return await self._finish(stage, Status.FAILED, message)
 
-        calculated_price = distance * config.rubles_per_meter * load_factor
-        price = max(config.min_cost, calculated_price)
+        calculated_cost = distance * config.rubles_per_meter * load_factor
+        cost = round(max(config.min_cost, calculated_cost), self._precision)
 
         delivery = await self._deliveries.get(pipeline.id)
-        delivery.estimate(price)
+        delivery.estimate(cost)
 
         _, stage = await asyncio.gather(
             self._deliveries.update_or_create(delivery),
