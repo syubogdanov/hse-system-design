@@ -1,5 +1,9 @@
 from abc import abstractmethod
-from typing import Protocol, Self
+from typing import TYPE_CHECKING, Protocol, Self
+
+
+if TYPE_CHECKING:
+    from src.domain.entities.config import Config
 
 
 class ConfigInterface(Protocol):
@@ -8,3 +12,7 @@ class ConfigInterface(Protocol):
     @abstractmethod
     async def actualize(self: Self) -> None:
         """Актуализировать конфигурацию."""
+
+    @abstractmethod
+    async def get(self: Self) -> "Config":
+        """Получить конфигурацию."""
