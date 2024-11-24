@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from src.domain.entities.config import Config
 from src.domain.services.interfaces.config import ConfigInterface
+from src.infrastructure.adapters.constants import retry_database, retry_external_api
 from src.infrastructure.models.config import ConfigModel
 
 
@@ -23,10 +24,12 @@ class ConfigAdapter(ConfigInterface):
 
     _config_model: ClassVar = ConfigModel
 
+    @retry_external_api
     async def actualize(self: Self) -> None:
         """Актуализировать конфигурацию."""
         raise NotImplementedError
 
+    @retry_database
     async def get(self: Self) -> "Config | None":
         """Получить конфигурацию."""
         query = select(self._config_model).order_by(self._config_model.fetched_at.desc()).limit(1)
