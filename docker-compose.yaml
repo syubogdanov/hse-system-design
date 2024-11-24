@@ -79,7 +79,7 @@ services:
 
   http-api:
     build: ./
-    command: [ "http-api" ]
+    command: [ "--start-http-api" ]
     container_name: http-api
     depends_on:
       database:
@@ -114,7 +114,7 @@ services:
 
   crontab:
     build: ./
-    command: [ "crontab" ]
+    command: [ "--start-crontab" ]
     container_name: crontab
     depends_on:
       database:
@@ -131,7 +131,7 @@ services:
 
   stream:
     build: ./
-    command: [ "stream" ]
+    command: [ "--start-stream" ]
     container_name: stream
     depends_on:
       database:
