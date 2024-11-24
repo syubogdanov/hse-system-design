@@ -20,6 +20,7 @@ from src.infrastructure.adapters.delivery import DeliveryAdapter
 from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
 from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
 from src.infrastructure.adapters.order import OrderAdapter
+from src.infrastructure.adapters.performer import PerformerAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
 from src.infrastructure.adapters.trigger import TriggerAdapter
@@ -45,6 +46,7 @@ if TYPE_CHECKING:
     from src.domain.services.interfaces.config import ConfigInterface
     from src.domain.services.interfaces.delivery import DeliveryInterface
     from src.domain.services.interfaces.order import OrderInterface
+    from src.domain.services.interfaces.performer import PerformerInterface
     from src.domain.services.interfaces.pipeline import PipelineInterface
     from src.domain.services.interfaces.stage import StageInterface
     from src.domain.services.interfaces.trigger import TriggerInterface
@@ -111,6 +113,11 @@ class Container(DeclarativeContainer):
         OrderAdapter,
         _logger=logger.provided,
     )
+    performer_adapter: Provider["PerformerInterface"] = Singleton(
+        PerformerAdapter,
+        _logger=logger.provided,
+        _session_factory=session_factory.provided,
+    )
     pipeline_adapter: Provider["PipelineInterface"] = Singleton(
         PipelineAdapter,
         _logger=logger.provided,
@@ -119,6 +126,7 @@ class Container(DeclarativeContainer):
     stage_adapter: Provider["StageInterface"] = Singleton(
         StageAdapter,
         _logger=logger.provided,
+        _session_factory=session_factory.provided,
     )
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
         TriggerAdapter,
