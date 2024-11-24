@@ -24,8 +24,8 @@ if TYPE_CHECKING:
 class EstimateCostRunner(StageRunner):
     """Оценить стоимость выполнения заказа."""
 
-    _configs: "ConfigInterface"
     _deliveries: "DeliveryInterface"
+    _configs: "ConfigInterface"
     _geography: "GeographyInterface"
     _logger: "Logger"
     _orders: "OrderInterface"

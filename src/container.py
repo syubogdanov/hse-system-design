@@ -18,6 +18,7 @@ from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
 from src.infrastructure.adapters.consumer import KafkaConsumerAdapter
 from src.infrastructure.adapters.delivery import DeliveryAdapter
+from src.infrastructure.adapters.geography import GeographyAdapter
 from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.performer import PerformerAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
@@ -36,6 +37,7 @@ from src.infrastructure.settings.order import OrderSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
 from src.infrastructure.settings.topic_name import TopicNameSettings
 
+
 if TYPE_CHECKING:
     from logging import Logger
 
@@ -44,6 +46,7 @@ if TYPE_CHECKING:
 
     from src.domain.services.interfaces.config import ConfigInterface
     from src.domain.services.interfaces.delivery import DeliveryInterface
+    from src.domain.services.interfaces.geography import GeographyInterface
     from src.domain.services.interfaces.order import OrderInterface
     from src.domain.services.interfaces.performer import PerformerInterface
     from src.domain.services.interfaces.pipeline import PipelineInterface
@@ -111,6 +114,10 @@ class Container(DeclarativeContainer):
         _logger=logger.provided,
         _session_factory=session_factory.provided,
     )
+    geography_adapter: Provider["GeographyInterface"] = Singleton(
+        GeographyAdapter,
+        _logger=logger.provided,
+    )
     order_adapter: Provider["OrderInterface"] = Singleton(
         OrderAdapter,
         _logger=logger.provided,
@@ -140,11 +147,23 @@ class Container(DeclarativeContainer):
 
     assign_performer_runner: Provider["StageRunner"] = Singleton(
         AssignPerformerRunner,
+        _deliveries=delivery_adapter.provided,
+        _geography=geography_adapter.provided,
         _logger=logger.provided,
+        _orders=order_adapter.provided,
+        _performers=performer_adapter.provided,
+        _pipelines=pipeline_adapter.provided,
+        _stages=stage_adapter.provided,
     )
     estimate_cost_runner: Provider["StageRunner"] = Singleton(
         EstimateCostRunner,
+        _configs=config_adapter.provided,
+        _deliveries=delivery_adapter.provided,
+        _geography=geography_adapter.provided,
         _logger=logger.provided,
+        _orders=order_adapter.provided,
+        _pipelines=pipeline_adapter.provided,
+        _stages=stage_adapter.provided,
     )
     perform_delivery_runner: Provider["StageRunner"] = Singleton(
         PerformDeliveryRunner,

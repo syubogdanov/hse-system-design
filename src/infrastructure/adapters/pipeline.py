@@ -1,4 +1,5 @@
-from contextlib import AbstractAsyncContextManager
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
@@ -100,10 +101,6 @@ class PipelineAdapter(PipelineInterface):
 
             return Pipeline.model_validate(model) if model is not None else None
 
-    def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:
-        """Заблокировать выполнение пайплайнов по заказу."""
-        raise NotImplementedError
-
     @retry_database
     async def exists(self: Self, pipeline_id: UUID) -> bool:
         """Проверить, что пайплайн существует."""
@@ -112,3 +109,8 @@ class PipelineAdapter(PipelineInterface):
         async with self._session_factory() as session:
             query_result = await session.execute(query)
             return bool(query_result.scalar())
+
+    @asynccontextmanager
+    async def lock(self: Self, order_id: UUID) -> AsyncGenerator[None, None]:
+        """Заблокировать выполнение пайплайнов по заказу."""
+        yield

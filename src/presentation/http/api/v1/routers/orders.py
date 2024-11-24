@@ -18,7 +18,7 @@ router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
 @router.post("/register", status_code=HTTPStatus.ACCEPTED)
-async def register(parameters: OrderParameters) -> UUID:
+async def register(parameters: OrderParameters) -> None:
     """Зарегистрировать заказ и начать пайплайн."""
     adapter = CONTAINER.order_adapter()
     launcher = CONTAINER.pipeline_launcher()
@@ -27,7 +27,7 @@ async def register(parameters: OrderParameters) -> UUID:
         detail = "The order has already been registered"
         raise HTTPException(HTTPStatus.CONFLICT, detail)
 
-    return await launcher.start_or_restart(order.id)
+    await launcher.start_or_restart(order.id)
 
 
 @router.get("/{id}/cost")

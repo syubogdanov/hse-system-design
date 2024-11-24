@@ -1,4 +1,5 @@
-from contextlib import AbstractAsyncContextManager
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
@@ -37,6 +38,7 @@ class PerformerAdapter(PerformerInterface):
             query_result = await session.execute(select(subquery))
             return bool(query_result.scalar())
 
-    def lock(self: Self, performer_id: UUID) -> AbstractAsyncContextManager[None]:
+    @asynccontextmanager
+    async def lock(self: Self, performer_id: UUID) -> AsyncGenerator[None, None]:
         """Заблокировать назначение исполнителя на заказы."""
-        raise NotImplementedError
+        yield
