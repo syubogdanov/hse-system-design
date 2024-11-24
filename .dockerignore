@@ -21,3 +21,6 @@ __pycache__/
 
 # pytest
 .pytest_cache/
+
+# sorting-hat
+stubs/

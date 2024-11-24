@@ -3,7 +3,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "sorting-hat"
+name = "config-stub"
 version = "1.0.0"
 description = "..."
 license = "MIT"
@@ -27,17 +27,11 @@ repository = "https://github.com/syubogdanov/hse-system-design"
 documentation = "https://github.com/syubogdanov/hse-system-design/tree/main/docs/"
 
 [tool.poetry.dependencies]
-aiocron = "^1.8"
-aiokafka = "~0.12"
-alembic = "^1.14"
-asyncpg = "^0.30"
 dependency-injector = "^4.43"
 fastapi = "^0.115"
 pydantic = "^2.9"
 pydantic-settings = "^2.6"
 python = "^3.11"
-sqlalchemy = "^2.0"
-tenacity = "^9.0"
 uvicorn = "^0.32"
 
 [tool.poetry.group.lint]

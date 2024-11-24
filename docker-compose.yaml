@@ -98,6 +98,23 @@ services:
     ports:
       - ${KAAS_UI_PORT:?}:8080
 
+  config-stub-http-api:
+    build: ./stubs/config/
+    command: [ "--start-http-api" ]
+    container_name: config-stub-http-api
+    environment:
+      - HTTP_API_HOST=${CONFIG_STUB_HTTP_API_HOST:?}
+      - HTTP_API_PORT=${CONFIG_STUB_HTTP_API_PORT:?}
+    healthcheck:
+      test: curl --fail http://${CONFIG_STUB_HTTP_API_HOST:?}:${CONFIG_STUB_HTTP_API_PORT:?}/api/v1/healthcheck
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${CONFIG_STUB_HTTP_API_HOST:?}
+    ports:
+      - ${CONFIG_STUB_HTTP_API_PORT:?}:${CONFIG_STUB_HTTP_API_PORT:?}
+    restart: unless-stopped
+
   http-api:
     build: ./
     command: [ "--start-http-api" ]
@@ -142,6 +159,8 @@ services:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
+      config-stub-http-api:
+        condition: service_healthy
     environment:
       - DATABASE_HOST=${DATABASE_HOST:?}
       - DATABASE_PORT=${DATABASE_PORT:?}
