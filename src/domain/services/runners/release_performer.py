@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.status import Status
+from src.domain.services.exceptions import StageError
 from src.domain.services.runners.base import StageRunner
 
 
@@ -31,6 +32,10 @@ class ReleasePerformerRunner(StageRunner):
             self._stages.update_or_create(stage),
             self._deliveries.get(stage.pipeline_id),
         )
+
+        if not delivery:
+            detail = "The delivery does not exist"
+            raise StageError(detail, stage)
 
         delivery.release()
 

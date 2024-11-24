@@ -1,9 +1,11 @@
+from http import HTTPStatus
 from typing import Annotated, Final
 from uuid import UUID
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, HTTPException, Path
 
 from src.container import CONTAINER
+from src.domain.entities.delivery import Delivery
 from src.domain.entities.pipeline import Pipeline
 from src.domain.entities.stage import Stage
 
@@ -37,3 +39,15 @@ async def get_stages(pipeline_id: Annotated[UUID, Path(alias="id")]) -> list[Sta
     adapter = CONTAINER.stage_adapter()
 
     return await adapter.get_all(pipeline_id=pipeline_id)
+
+
+@router.get("/{id}/delivery")
+async def get_delivery(pipeline_id: Annotated[UUID, Path(alias="id")]) -> Delivery:
+    """Получить доставку, назначенную пайплайном."""
+    adapter = CONTAINER.delivery_adapter()
+
+    if not (delivery := await adapter.get(pipeline_id)):
+        detail = "No deliveries have been initialized yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    return delivery

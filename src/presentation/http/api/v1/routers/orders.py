@@ -63,3 +63,24 @@ async def restart_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -
     launcher = CONTAINER.pipeline_launcher()
 
     return await launcher.start_or_restart(order_id)
+
+
+@router.get("/{id}/performer")
+async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
+    """Получить исполнителя заказа."""
+    pipeline_adapter = CONTAINER.pipeline_adapter()
+    delivery_adapter = CONTAINER.delivery_adapter()
+
+    if not (pipeline := await pipeline_adapter.get_latest(order_id)):
+        detail = "No pipelines have been launched yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    if not (delivery := await delivery_adapter.get(pipeline.id)):
+        detail = "No deliveries have been initialized yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    if not delivery.performer_id:
+        detail = "No performers have been assigned yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    return delivery.performer_id

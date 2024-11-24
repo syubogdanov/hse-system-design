@@ -17,7 +17,7 @@ class DeliveryAdapter(DeliveryInterface):
 
     _logger: "Logger"
 
-    async def get(self: Self, pipeline_id: UUID) -> "Delivery":
+    async def get(self: Self, pipeline_id: UUID) -> "Delivery | None":
         """Получить доставку по идентификатору пайплайна."""
         raise NotImplementedError
 
