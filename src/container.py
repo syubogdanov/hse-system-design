@@ -36,7 +36,6 @@ from src.infrastructure.settings.order import OrderSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
 from src.infrastructure.settings.topic_name import TopicNameSettings
 
-
 if TYPE_CHECKING:
     from logging import Logger
 
@@ -109,10 +108,12 @@ class Container(DeclarativeContainer):
     delivery_adapter: Provider["DeliveryInterface"] = Singleton(
         DeliveryAdapter,
         _logger=logger.provided,
+        _session_factory=session_factory.provided,
     )
     order_adapter: Provider["OrderInterface"] = Singleton(
         OrderAdapter,
         _logger=logger.provided,
+        _session_factory=session_factory.provided,
     )
     performer_adapter: Provider["PerformerInterface"] = Singleton(
         PerformerAdapter,
