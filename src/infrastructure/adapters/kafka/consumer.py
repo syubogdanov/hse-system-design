@@ -28,7 +28,7 @@ class KafkaConsumerAdapter:
             group_id=self._settings.group_id,
         )
 
-    async def consume(self: Self, topic_name: str) -> AsyncIterator[bytes | None]:
+    async def consume(self: Self, topic_name: str) -> AsyncIterator[bytes]:
         """Потреблять сообщения из топика."""
         consumer = self._consumer_factory(topic_name)
 
