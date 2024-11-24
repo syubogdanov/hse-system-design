@@ -3,12 +3,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
 
-from sqlalchemy.sql import select, update
+from sqlalchemy.sql import exists, select, update
 
 from src.domain.entities.pipeline import Pipeline
 from src.domain.services.exceptions import NotFoundError
 from src.domain.services.interfaces.pipeline import PipelineInterface
 from src.infrastructure.adapters.constants import retry_database
+from src.infrastructure.models.order import OrderModel
 from src.infrastructure.models.pipeline import PipelineModel
 
 
@@ -25,6 +26,7 @@ class PipelineAdapter(PipelineInterface):
     _logger: "Logger"
     _session_factory: "SessionFactory"
 
+    _order_model: ClassVar = OrderModel
     _pipeline_model: ClassVar = PipelineModel
 
     @retry_database
@@ -76,7 +78,9 @@ class PipelineAdapter(PipelineInterface):
     @retry_database
     async def get_latest(self: Self, order_id: UUID) -> "Pipeline | None":
         """Получить последний созданный пайплайн."""
-        query = (
+        exists_query = select(exists().where(self._order_model.id == order_id))
+
+        select_query = (
             select(self._pipeline_model)
             .where(self._pipeline_model.order_id == order_id)
             .order_by(self._pipeline_model.created_at.desc())
@@ -84,11 +88,27 @@ class PipelineAdapter(PipelineInterface):
         )
 
         async with self._session_factory() as session:
-            query_result = await session.execute(query)
-            model = query_result.scalar()
+            exists_query_result = await session.execute(exists_query)
+            order_exists = bool(exists_query_result.scalar())
+
+            if not order_exists:
+                detail = "The order was not found"
+                raise NotFoundError(detail)
+
+            select_query_result = await session.execute(select_query)
+            model = select_query_result.scalar()
 
             return Pipeline.model_validate(model) if model is not None else None
 
     def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:
         """Заблокировать выполнение пайплайнов по заказу."""
         raise NotImplementedError
+
+    @retry_database
+    async def exists(self: Self, pipeline_id: UUID) -> bool:
+        """Проверить, что пайплайн существует."""
+        query = select(exists().where(self._pipeline_model.id == pipeline_id))
+
+        async with self._session_factory() as session:
+            query_result = await session.execute(query)
+            return bool(query_result.scalar())

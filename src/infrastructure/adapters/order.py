@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
 
-from sqlalchemy.sql import delete, select
+from sqlalchemy.sql import delete, exists, select
 
 from src.domain.entities.order import Order, OrderParameters
 from src.domain.services.exceptions import NotFoundError
@@ -70,3 +70,12 @@ class OrderAdapter(OrderInterface):
 
         async with self._session_factory() as session:
             await session.execute(query)
+
+    @retry_database
+    async def exists(self: Self, order_id: UUID) -> bool:
+        """Проверить, что заказ существует."""
+        query = select(exists().where(self._order_model.id == order_id))
+
+        async with self._session_factory() as session:
+            query_result = await session.execute(query)
+            return bool(query_result.scalar())

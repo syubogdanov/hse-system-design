@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import exists, select, update
 
 from src.domain.entities.stage import Stage
 from src.domain.services.exceptions import NotFoundError
 from src.domain.services.interfaces.stage import StageInterface
 from src.infrastructure.adapters.constants import retry_database
+from src.infrastructure.models.pipeline import PipelineModel
 from src.infrastructure.models.stage import StageModel
 
 
@@ -24,6 +25,7 @@ class StageAdapter(StageInterface):
     _logger: "Logger"
     _session_factory: "SessionFactory"
 
+    _pipeline_model: ClassVar = PipelineModel
     _stage_model: ClassVar = StageModel
 
     @retry_database
@@ -75,7 +77,9 @@ class StageAdapter(StageInterface):
     @retry_database
     async def get_latest(self: Self, pipeline_id: UUID) -> "Stage | None":
         """Получить последний созданный этап."""
-        query = (
+        exists_query = select(exists().where(self._pipeline_model.id == pipeline_id))
+
+        select_query = (
             select(self._stage_model)
             .where(self._stage_model.pipeline_id == pipeline_id)
             .order_by(self._stage_model.created_at.desc())
@@ -83,7 +87,14 @@ class StageAdapter(StageInterface):
         )
 
         async with self._session_factory() as session:
-            query_result = await session.execute(query)
-            model = query_result.scalar()
+            exists_query_result = await session.execute(exists_query)
+            pipeline_exists = bool(exists_query_result.scalar())
+
+            if not pipeline_exists:
+                detail = "The pipeline was not found"
+                raise NotFoundError(detail)
+
+            select_query_result = await session.execute(select_query)
+            model = select_query_result.scalar()
 
             return Stage.model_validate(model) if model is not None else None

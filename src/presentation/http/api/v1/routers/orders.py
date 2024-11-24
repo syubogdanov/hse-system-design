@@ -33,8 +33,8 @@ async def register(parameters: OrderParameters) -> UUID:
 @router.get("/{id}/cost")
 async def get_cost(order_id: Annotated[UUID, Path(alias="id")]) -> NonNegativeFloat:
     """Получить исполнителя заказа."""
-    pipeline_adapter = CONTAINER.pipeline_adapter()
     delivery_adapter = CONTAINER.delivery_adapter()
+    pipeline_adapter = CONTAINER.pipeline_adapter()
 
     if not (pipeline := await pipeline_adapter.get_latest(order_id)):
         detail = "No pipelines have been launched yet"
@@ -56,8 +56,8 @@ async def get_cost(order_id: Annotated[UUID, Path(alias="id")]) -> NonNegativeFl
 @router.get("/{id}/performer")
 async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
     """Получить исполнителя заказа."""
-    pipeline_adapter = CONTAINER.pipeline_adapter()
     delivery_adapter = CONTAINER.delivery_adapter()
+    pipeline_adapter = CONTAINER.pipeline_adapter()
 
     if not (pipeline := await pipeline_adapter.get_latest(order_id)):
         detail = "No pipelines have been launched yet"
@@ -79,9 +79,14 @@ async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
 @router.get("/{id}/pipelines")
 async def get_pipelines(order_id: Annotated[UUID, Path(alias="id")]) -> list[Pipeline]:
     """Получить список пайплайнов заказа."""
-    adapter = CONTAINER.pipeline_adapter()
+    order_adapter = CONTAINER.order_adapter()
+    pipeline_adapter = CONTAINER.pipeline_adapter()
 
-    return await adapter.get_all(order_id=order_id)
+    if not await order_adapter.exists(order_id):
+        detail = "The order was not found"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    return await pipeline_adapter.get_all(order_id=order_id)
 
 
 @router.get("/{id}/pipelines/latest")

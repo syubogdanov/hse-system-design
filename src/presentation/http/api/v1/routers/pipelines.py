@@ -1,7 +1,8 @@
+from http import HTTPStatus
 from typing import Annotated, Final
 from uuid import UUID
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, HTTPException, Path
 
 from src.container import CONTAINER
 from src.domain.entities.delivery import Delivery
@@ -35,9 +36,14 @@ async def get(pipeline_id: Annotated[UUID, Path(alias="id")]) -> Pipeline:
 @router.get("/{id}/stages")
 async def get_stages(pipeline_id: Annotated[UUID, Path(alias="id")]) -> list[Stage]:
     """Получить все этапы пайплайна."""
-    adapter = CONTAINER.stage_adapter()
+    pipeline_adapter = CONTAINER.pipeline_adapter()
+    stage_adapter = CONTAINER.stage_adapter()
 
-    return await adapter.get_all(pipeline_id=pipeline_id)
+    if not await pipeline_adapter.exists(pipeline_id):
+        detail = "The pipeline was not found"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    return await stage_adapter.get_all(pipeline_id=pipeline_id)
 
 
 @router.get("/{id}/delivery")

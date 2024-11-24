@@ -22,3 +22,7 @@ class OrderInterface(Protocol):
     @abstractmethod
     async def clean(self: Self, retention: timedelta) -> None:
         """Очистить устаревшие данные."""
+
+    @abstractmethod
+    async def exists(self: Self, order_id: UUID) -> bool:
+        """Проверить, что заказ существует."""

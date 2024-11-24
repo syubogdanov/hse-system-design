@@ -30,3 +30,7 @@ class PipelineInterface(Protocol):
     @abstractmethod
     def lock(self: Self, order_id: UUID) -> AbstractAsyncContextManager[None]:
         """Заблокировать выполнение пайплайнов по заказу."""
+
+    @abstractmethod
+    async def exists(self: Self, pipeline_id: UUID) -> bool:
+        """Проверить, что пайплайн существует."""
