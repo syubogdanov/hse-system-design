@@ -39,9 +39,7 @@ async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
         detail = "No pipelines have been launched yet"
         raise HTTPException(HTTPStatus.NOT_FOUND, detail)
 
-    if not (delivery := await delivery_adapter.get(pipeline.id)):
-        detail = "No deliveries have been initialized yet"
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+    delivery = await delivery_adapter.get(pipeline.id)
 
     if not delivery.performer_id:
         detail = "No performers have been assigned yet"

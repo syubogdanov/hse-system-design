@@ -33,10 +33,6 @@ class ReleasePerformerRunner(StageRunner):
             self._deliveries.get(stage.pipeline_id),
         )
 
-        if not delivery:
-            detail = "The delivery does not exist"
-            raise StageError(detail, stage)
-
         delivery.release()
 
         stage.finish(Status.SUCCEEDED)

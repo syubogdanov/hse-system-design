@@ -1,7 +1,7 @@
 from typing import Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel
+from pydantic import AwareDatetime, BaseModel, NonNegativeFloat
 
 from utils.datetime import utcnow
 
@@ -10,6 +10,9 @@ class Delivery(BaseModel):
     """Сущность доставки."""
 
     pipeline_id: UUID
+
+    price: NonNegativeFloat | None = None
+    estimated_at: AwareDatetime | None = None
 
     performer_id: UUID | None = None
     assigned_at: AwareDatetime | None = None
@@ -24,8 +27,7 @@ class Delivery(BaseModel):
         """Освободить исполнителя."""
         self.released_at = utcnow()
 
-    def clear(self: Self) -> None:
-        """Очистить сущность от данных."""
-        self.performer_id = None
-        self.assigned_at = None
-        self.released_at = None
+    def estimate(self: Self, price: NonNegativeFloat) -> None:
+        """Оценить стоимость заказа."""
+        self.price = price
+        self.estimated_at = utcnow()

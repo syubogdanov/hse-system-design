@@ -20,6 +20,6 @@ class ConfigAdapter(ConfigInterface):
         """Актуализировать конфигурацию."""
         raise NotImplementedError
 
-    async def get(self: Self) -> "Config":
+    async def get(self: Self) -> "Config | None":
         """Получить конфигурацию."""
         raise NotImplementedError

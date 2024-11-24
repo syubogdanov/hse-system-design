@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING, Protocol, Self
+from uuid import UUID
 
 
 if TYPE_CHECKING:
@@ -9,6 +10,10 @@ if TYPE_CHECKING:
 
 class OrderInterface(Protocol):
     """Интерфейс заказа."""
+
+    @abstractmethod
+    async def get(self: Self, order_id: UUID) -> "Order":
+        """Получить заказ по идентификатору."""
 
     @abstractmethod
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import TYPE_CHECKING, Self
+from uuid import UUID
 
 from src.domain.services.interfaces.order import OrderInterface
 
@@ -16,6 +17,10 @@ class OrderAdapter(OrderInterface):
     """Адаптер заказа."""
 
     _logger: "Logger"
+
+    async def get(self: Self, order_id: UUID) -> "Order":
+        """Получить заказ по идентификатору."""
+        raise NotImplementedError
 
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
         """Зарегистрировать заказ."""

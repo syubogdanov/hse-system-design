@@ -14,5 +14,5 @@ class ConfigInterface(Protocol):
         """Актуализировать конфигурацию."""
 
     @abstractmethod
-    async def get(self: Self) -> "Config":
+    async def get(self: Self) -> "Config | None":
         """Получить конфигурацию."""

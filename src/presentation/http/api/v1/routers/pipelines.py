@@ -46,8 +46,4 @@ async def get_delivery(pipeline_id: Annotated[UUID, Path(alias="id")]) -> Delive
     """Получить доставку, назначенную пайплайном."""
     adapter = CONTAINER.delivery_adapter()
 
-    if not (delivery := await adapter.get(pipeline_id)):
-        detail = "No deliveries have been initialized yet"
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
-
-    return delivery
+    return await adapter.get(pipeline_id)

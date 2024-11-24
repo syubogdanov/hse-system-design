@@ -11,7 +11,7 @@ class DeliveryInterface(Protocol):
     """Интерфейс доставки."""
 
     @abstractmethod
-    async def get(self: Self, pipeline_id: UUID) -> "Delivery | None":
+    async def get(self: Self, pipeline_id: UUID) -> "Delivery":
         """Получить доставку по идентификатору пайплайна."""
 
     @abstractmethod
