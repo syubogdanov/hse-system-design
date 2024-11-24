@@ -20,12 +20,16 @@ services:
 
   migrations:
     build: ./
-    command: [ "alembic", "--config", "migrations/alembic.ini", "upgrade", "head" ]
+    command: |
+      "
+      alembic --config migrations/alembic.ini revision --autogenerate --message "..."
+      alembic --config migrations/alembic.ini upgrade head
+      "
     container_name: migrations
     depends_on:
       database:
         condition: service_healthy
-    entrypoint: [ "python", "-B", "-m" ]
+    entrypoint: [ "/bin/sh", "-c" ]
     environment:
       - DATABASE_HOST=${DATABASE_HOST:?}
       - DATABASE_PORT=${DATABASE_PORT:?}
@@ -76,6 +80,20 @@ services:
         condition: service_healthy
     entrypoint: [ "/bin/sh", "-c" ]
     image: confluentinc/cp-kafka:7.6.1
+
+  kafka-ui:
+    container_name: kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+      topics:
+        condition: service_completed_successfully
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=KaaS
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - ${KAAS_UI_PORT:?}:8080
 
   http-api:
     build: ./
