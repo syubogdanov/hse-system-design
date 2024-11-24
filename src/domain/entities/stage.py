@@ -58,8 +58,3 @@ class Stage(BaseModel):
         self.status = status
         self.message = message
         self.finished_at = utcnow()
-
-    def autofinish(self: Self, status: Status, message: str | None = None) -> None:
-        """Запустить и сразу же завершить этап."""
-        self.start()
-        self.finish(status, message)

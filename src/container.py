@@ -109,6 +109,7 @@ class Container(DeclarativeContainer):
     )
     start_pipeline_runner: Provider["StageRunner"] = Singleton(
         StartPipelineRunner,
+        _deliveries=delivery_adapter.provided,
         _logger=logger.provided,
         _pipelines=pipeline_adapter.provided,
         _stages=stage_adapter.provided,
