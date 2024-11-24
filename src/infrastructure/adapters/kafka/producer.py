@@ -26,5 +26,5 @@ class KafkaProducerAdapter:
 
     async def produce(self: Self, topic_name: str, event: SupportsBytes) -> None:
         """Отправить сообщение в топик."""
-        async with self._producer as writer:
-            await writer.send_and_wait(topic_name, bytes(event))
+        async with self._producer as context:
+            await context.send_and_wait(topic_name, bytes(event))

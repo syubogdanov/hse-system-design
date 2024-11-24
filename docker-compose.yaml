@@ -58,6 +58,9 @@ services:
     environment:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?}
       - KAFKA_BROKER_PORT=${KAAS_BROKER_PORT:?}
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_ZOOKEEPER_CONNECT=${KAAS_ZOOKEEPER_HOST:?}:${KAAS_ZOOKEEPER_PORT:?}
     healthcheck:
       test: kafka-topics --list --bootstrap-server localhost:${KAAS_BROKER_PORT:?}
@@ -71,8 +74,8 @@ services:
   topics:
     command: |
       "
-      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_RESULTS:?} --replication-factor 1 --partitions 1
-      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_TRIGGERS:?} --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_RESULTS:?} --partitions 1
+      kafka-topics --bootstrap-server ${KAAS_BROKER_HOST:?}:${KAAS_BROKER_PORT:?} --create --if-not-exists --topic ${TOPIC_NAME_TRIGGERS:?} --partitions 1
       "
     container_name: topics
     depends_on:

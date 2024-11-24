@@ -22,11 +22,22 @@ class StreamLauncher:
     @classmethod
     async def _run_stream(cls: type[Self]) -> None:
         """Вычитывать и обрабатывать сообщения."""
+        logger = CONTAINER.logger()
         consumer = CONTAINER.kafka_consumer_adapter()
-        topic = CONTAINER.topic_name_settings()
-        settings = CONTAINER.pipeline_settings()
+        topic_name_settings = CONTAINER.topic_name_settings()
+        pipeline_settings = CONTAINER.pipeline_settings()
 
         await asyncio.gather(
-            waitmap(on_result, consumer.consume(topic.results), settings.max_concurrent_results),
-            waitmap(on_trigger, consumer.consume(topic.triggers), settings.max_concurrent_triggers),
+            waitmap(
+                on_result,
+                consumer.consume(topic_name_settings.results),
+                max_concurrent_tasks=pipeline_settings.max_concurrent_results,
+                logger=logger,
+            ),
+            waitmap(
+                on_trigger,
+                consumer.consume(topic_name_settings.triggers),
+                max_concurrent_tasks=pipeline_settings.max_concurrent_triggers,
+                logger=logger,
+            ),
         )
