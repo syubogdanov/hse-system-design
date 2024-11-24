@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Self
 from uuid import UUID
 
 from src.domain.services.interfaces.order import OrderInterface
+from src.infrastructure.adapters.constants import retry_database
 
 
 if TYPE_CHECKING:
@@ -18,14 +19,17 @@ class OrderAdapter(OrderInterface):
 
     _logger: "Logger"
 
+    @retry_database
     async def get(self: Self, order_id: UUID) -> "Order":
         """Получить заказ по идентификатору."""
         raise NotImplementedError
 
+    @retry_database
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
         """Зарегистрировать заказ."""
         raise NotImplementedError
 
+    @retry_database
     async def clean(self: Self, retention: timedelta) -> None:
         """Очистить устаревшие данные."""
         raise NotImplementedError

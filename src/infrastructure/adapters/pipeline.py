@@ -8,6 +8,7 @@ from sqlalchemy.sql import select, update
 from src.domain.entities.pipeline import Pipeline
 from src.domain.services.exceptions import NotFoundError
 from src.domain.services.interfaces.pipeline import PipelineInterface
+from src.infrastructure.adapters.constants import retry_database
 from src.infrastructure.models.pipeline import PipelineModel
 
 
@@ -26,6 +27,7 @@ class PipelineAdapter(PipelineInterface):
 
     _pipeline_model: ClassVar = PipelineModel
 
+    @retry_database
     async def get(self: Self, pipeline_id: UUID) -> "Pipeline":
         """Получить пайплайн по идентификатору."""
         query = select(self._pipeline_model).where(self._pipeline_model.id == pipeline_id)
@@ -39,6 +41,7 @@ class PipelineAdapter(PipelineInterface):
 
             return Pipeline.model_validate(model)
 
+    @retry_database
     async def get_all(self: Self, *, order_id: UUID | None = None) -> list["Pipeline"]:
         """Получить список всех пайплайнов."""
         query = select(self._pipeline_model)
@@ -52,6 +55,7 @@ class PipelineAdapter(PipelineInterface):
 
             return [Pipeline.model_validate(model) for model in models]
 
+    @retry_database
     async def update_or_create(self: Self, pipeline: "Pipeline") -> None:
         """Обновить или сохранить пайплайн."""
         pipeline_as_dict = pipeline.model_dump()
@@ -69,6 +73,7 @@ class PipelineAdapter(PipelineInterface):
                 model = self._pipeline_model(**pipeline_as_dict)
                 session.add(model)
 
+    @retry_database
     async def get_latest(self: Self, order_id: UUID) -> "Pipeline | None":
         """Получить последний созданный пайплайн."""
         query = (

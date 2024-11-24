@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.entities.trigger import Trigger
-    from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+    from src.infrastructure.adapters.producer import KafkaProducerAdapter
 
 
 @dataclass

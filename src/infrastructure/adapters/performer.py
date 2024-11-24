@@ -6,6 +6,7 @@ from uuid import UUID
 from sqlalchemy.sql import exists, select
 
 from src.domain.services.interfaces.performer import PerformerInterface
+from src.infrastructure.adapters.constants import retry_database
 from src.infrastructure.models.delivery import DeliveryModel
 
 
@@ -24,6 +25,7 @@ class PerformerAdapter(PerformerInterface):
 
     _delivery_model: ClassVar = DeliveryModel
 
+    @retry_database
     async def is_busy(self: Self, performer_id: UUID) -> bool:
         """Получить пайплайн по идентификатору."""
         subquery = exists().where(

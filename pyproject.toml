@@ -38,6 +38,7 @@ pydantic-settings = "^2.6"
 python = "^3.11"
 python-dotenv = "^1.0"
 sqlalchemy = "^2.0"
+tenacity = "^9.0"
 uvicorn = "^0.32"
 
 [tool.poetry.group.lint]

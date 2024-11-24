@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Self
 from uuid import UUID
 
 from src.domain.services.interfaces.delivery import DeliveryInterface
+from src.infrastructure.adapters.constants import retry_database
 
 
 if TYPE_CHECKING:
@@ -17,10 +18,12 @@ class DeliveryAdapter(DeliveryInterface):
 
     _logger: "Logger"
 
+    @retry_database
     async def get(self: Self, pipeline_id: UUID) -> "Delivery":
         """Получить доставку по идентификатору пайплайна."""
         raise NotImplementedError
 
+    @retry_database
     async def update_or_create(self: Self, delivery: "Delivery") -> None:
         """Обновить или сохранить доставку."""
         raise NotImplementedError

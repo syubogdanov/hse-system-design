@@ -7,6 +7,7 @@ from sqlalchemy import select, update
 from src.domain.entities.stage import Stage
 from src.domain.services.exceptions import NotFoundError
 from src.domain.services.interfaces.stage import StageInterface
+from src.infrastructure.adapters.constants import retry_database
 from src.infrastructure.models.stage import StageModel
 
 
@@ -25,6 +26,7 @@ class StageAdapter(StageInterface):
 
     _stage_model: ClassVar = StageModel
 
+    @retry_database
     async def update_or_create(self: Self, stage: "Stage") -> None:
         """Обновить или сохранить этап."""
         stage_as_dict = stage.model_dump()
@@ -42,6 +44,7 @@ class StageAdapter(StageInterface):
                 model = self._stage_model(**stage_as_dict)
                 session.add(model)
 
+    @retry_database
     async def get(self: Self, stage_id: UUID) -> "Stage":
         """Получить этап по идентификатору."""
         query = select(self._stage_model).where(self._stage_model.id == stage_id)
@@ -55,6 +58,7 @@ class StageAdapter(StageInterface):
 
             return Stage.model_validate(model)
 
+    @retry_database
     async def get_all(self: Self, *, pipeline_id: UUID | None = None) -> list["Stage"]:
         """Получить список всех этапов."""
         query = select(self._stage_model)
@@ -68,6 +72,7 @@ class StageAdapter(StageInterface):
 
             return [Stage.model_validate(model) for model in models]
 
+    @retry_database
     async def get_latest(self: Self, pipeline_id: UUID) -> "Stage | None":
         """Получить последний созданный этап."""
         query = (

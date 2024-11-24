@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING, Self, SupportsBytes
 
 from aiokafka.producer import AIOKafkaProducer
 
+from src.infrastructure.adapters.constants import retry_kafka
+
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -24,6 +26,7 @@ class KafkaProducerAdapter:
             client_id=self._settings.client_id,
         )
 
+    @retry_kafka
     async def produce(self: Self, topic_name: str, event: SupportsBytes) -> None:
         """Отправить сообщение в топик."""
         async with self._producer as context:

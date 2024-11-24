@@ -17,8 +17,8 @@ from src.domain.services.runners.release_performer import ReleasePerformerRunner
 from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
 from src.infrastructure.adapters.delivery import DeliveryAdapter
-from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
-from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
+from src.infrastructure.adapters.consumer import KafkaConsumerAdapter
+from src.infrastructure.adapters.producer import KafkaProducerAdapter
 from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.performer import PerformerAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
