@@ -7,13 +7,14 @@ from uuid import UUID
 from sqlalchemy.sql import exists, select
 
 from src.domain.services.interfaces.performer import PerformerInterface
-from src.infrastructure.adapters.constants import retry_database
+from src.infrastructure.adapters.constants import retry_database, retry_external_api
 from src.infrastructure.models.delivery import DeliveryModel
 
 
 if TYPE_CHECKING:
     from logging import Logger
 
+    from src.domain.entities.performer import Performer
     from utils.typing import SessionFactory
 
 
@@ -37,6 +38,11 @@ class PerformerAdapter(PerformerInterface):
         async with self._session_factory() as session:
             query_result = await session.execute(select(subquery))
             return bool(query_result.scalar())
+
+    @retry_external_api
+    async def get_nearest(self: Self, zone_id: UUID) -> list["Performer"]:
+        """Получить свободных исполнителей."""
+        raise NotImplementedError
 
     @asynccontextmanager
     async def lock(self: Self, performer_id: UUID) -> AsyncGenerator[None, None]:

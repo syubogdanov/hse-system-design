@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from functools import partial
 from typing import TYPE_CHECKING, Self, SupportsBytes
 
 from aiokafka.producer import AIOKafkaProducer
@@ -21,7 +22,8 @@ class KafkaProducerAdapter:
 
     def __post_init__(self: Self) -> None:
         """Дополнительная инициализация объекта."""
-        self._producer = AIOKafkaProducer(
+        self._producer_factory = partial(
+            AIOKafkaProducer,
             bootstrap_servers=self._settings.bootstrap_servers,
             client_id=self._settings.client_id,
         )
@@ -29,5 +31,5 @@ class KafkaProducerAdapter:
     @retry_kafka
     async def produce(self: Self, topic_name: str, event: SupportsBytes) -> None:
         """Отправить сообщение в топик."""
-        async with self._producer as context:
-            await context.send_and_wait(topic_name, bytes(event))
+        async with self._producer_factory() as producer:
+            await producer.send_and_wait(topic_name, bytes(event))

@@ -30,8 +30,6 @@ class KafkaConsumerAdapter:
 
     async def consume(self: Self, topic_name: str) -> AsyncIterator[bytes]:
         """Потреблять сообщения из топика."""
-        consumer = self._consumer_factory(topic_name)
-
-        async with consumer as context:
-            async for event in context:
+        async with self._consumer_factory(topic_name) as consumer:
+            async for event in consumer:
                 yield event.value

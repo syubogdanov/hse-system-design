@@ -23,6 +23,6 @@ class DeliveryModel(BaseModel):
     cost: Mapped[float | None]
     estimated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    performer_id: Mapped[UUID]
+    performer_id: Mapped[UUID | None]
     assigned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
