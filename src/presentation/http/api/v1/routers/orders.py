@@ -3,6 +3,7 @@ from typing import Annotated, Final
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path
+from pydantic import NonNegativeFloat
 
 from src.container import CONTAINER
 from src.domain.entities.order import OrderParameters
@@ -29,6 +30,29 @@ async def register(parameters: OrderParameters) -> UUID:
     return await launcher.start_or_restart(order.id)
 
 
+@router.get("/{id}/cost")
+async def get_cost(order_id: Annotated[UUID, Path(alias="id")]) -> NonNegativeFloat:
+    """Получить исполнителя заказа."""
+    pipeline_adapter = CONTAINER.pipeline_adapter()
+    delivery_adapter = CONTAINER.delivery_adapter()
+
+    if not (pipeline := await pipeline_adapter.get_latest(order_id)):
+        detail = "No pipelines have been launched yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    if not pipeline.status.is_final():
+        detail = "The pipeline is still running..."
+        raise HTTPException(HTTPStatus.BAD_REQUEST, detail)
+
+    delivery = await delivery_adapter.get(pipeline.id)
+
+    if delivery.cost is None:
+        detail = "The cost has not been estimated"
+        raise HTTPException(HTTPStatus.EXPECTATION_FAILED, detail)
+
+    return delivery.cost
+
+
 @router.get("/{id}/performer")
 async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
     """Получить исполнителя заказа."""
@@ -39,11 +63,15 @@ async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
         detail = "No pipelines have been launched yet"
         raise HTTPException(HTTPStatus.NOT_FOUND, detail)
 
+    if not pipeline.status.is_final():
+        detail = "The pipeline is still running..."
+        raise HTTPException(HTTPStatus.BAD_REQUEST, detail)
+
     delivery = await delivery_adapter.get(pipeline.id)
 
     if not delivery.performer_id:
-        detail = "No performers have been assigned yet"
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+        detail = "No performers have been assigned"
+        raise HTTPException(HTTPStatus.EXPECTATION_FAILED, detail)
 
     return delivery.performer_id
 

@@ -12,7 +12,7 @@ class StageName(StrEnum):
     """Название этапа."""
 
     START_PIPELINE = auto()
-    ESTIMATE_PRICE = auto()
+    ESTIMATE_COST = auto()
     ASSIGN_PERFORMER = auto()
     PERFORM_DELIVERY = auto()
     RELEASE_PERFORMER = auto()
@@ -20,8 +20,8 @@ class StageName(StrEnum):
     def get_next(self: Self) -> "StageName | None":
         """Получить название следующего этапа."""
         next_stages = {
-            StageName.START_PIPELINE: StageName.ESTIMATE_PRICE,
-            StageName.ESTIMATE_PRICE: StageName.ASSIGN_PERFORMER,
+            StageName.START_PIPELINE: StageName.ESTIMATE_COST,
+            StageName.ESTIMATE_COST: StageName.ASSIGN_PERFORMER,
             StageName.ASSIGN_PERFORMER: StageName.PERFORM_DELIVERY,
             StageName.PERFORM_DELIVERY: StageName.RELEASE_PERFORMER,
         }
@@ -29,7 +29,7 @@ class StageName(StrEnum):
 
     def is_cancelable(self: Self) -> bool:
         """Проверить, разрешена ли отмена этапа."""
-        return self in {StageName.START_PIPELINE, StageName.ESTIMATE_PRICE}
+        return self in {StageName.START_PIPELINE, StageName.ESTIMATE_COST}
 
     @staticmethod
     def first() -> "StageName":

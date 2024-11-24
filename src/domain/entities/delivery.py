@@ -11,7 +11,7 @@ class Delivery(BaseModel):
 
     pipeline_id: UUID
 
-    price: NonNegativeFloat | None = None
+    cost: NonNegativeFloat | None = None
     estimated_at: AwareDatetime | None = None
 
     performer_id: UUID | None = None
@@ -27,7 +27,7 @@ class Delivery(BaseModel):
         """Освободить исполнителя."""
         self.released_at = utcnow()
 
-    def estimate(self: Self, price: NonNegativeFloat) -> None:
+    def estimate(self: Self, cost: NonNegativeFloat) -> None:
         """Оценить стоимость заказа."""
-        self.price = price
+        self.cost = cost
         self.estimated_at = utcnow()

@@ -1,8 +1,7 @@
-from http import HTTPStatus
 from typing import Annotated, Final
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Path
 
 from src.container import CONTAINER
 from src.domain.entities.delivery import Delivery

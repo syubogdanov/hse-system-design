@@ -7,6 +7,6 @@ class Config(BaseModel):
     """Сущность конфига."""
 
     id: UUID
-    min_price: NonNegativeFloat
+    min_cost: NonNegativeFloat
     rubles_per_meter: NonNegativeFloat
     fetched_at: AwareDatetime

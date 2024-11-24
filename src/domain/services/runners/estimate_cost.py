@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class EstimatePriceRunner(StageRunner):
+class EstimateCostRunner(StageRunner):
     """Оценить стоимость выполнения заказа."""
 
     _configs: "ConfigInterface"
@@ -54,7 +54,7 @@ class EstimatePriceRunner(StageRunner):
         load_factor = await self._geography.get_load_factor(source_zone_id)
 
         calculated_price = distance * config.rubles_per_meter * load_factor
-        price = max(config.min_price, calculated_price)
+        price = max(config.min_cost, calculated_price)
 
         delivery = await self._deliveries.get(pipeline.id)
         delivery.estimate(price)

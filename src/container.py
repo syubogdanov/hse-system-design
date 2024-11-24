@@ -8,7 +8,7 @@ from src.domain.entities.stage import StageName
 from src.domain.services.launchers.pipeline import PipelineLauncher
 from src.domain.services.launchers.stage import StageLauncher
 from src.domain.services.runners.assign_performer import AssignPerformerRunner
-from src.domain.services.runners.estimate_price import EstimatePriceRunner
+from src.domain.services.runners.estimate_cost import EstimateCostRunner
 from src.domain.services.runners.perform_delivery import PerformDeliveryRunner
 from src.domain.services.runners.release_performer import ReleasePerformerRunner
 from src.domain.services.runners.start_pipeline import StartPipelineRunner
@@ -92,8 +92,8 @@ class Container(DeclarativeContainer):
         AssignPerformerRunner,
         _logger=logger.provided,
     )
-    estimate_price_runner: Provider["StageRunner"] = Singleton(
-        EstimatePriceRunner,
+    estimate_cost_runner: Provider["StageRunner"] = Singleton(
+        EstimateCostRunner,
         _logger=logger.provided,
     )
     perform_delivery_runner: Provider["StageRunner"] = Singleton(
@@ -118,7 +118,7 @@ class Container(DeclarativeContainer):
     runners: Provider[dict["StageName", "StageRunner"]] = Dict(
         {
             StageName.ASSIGN_PERFORMER: assign_performer_runner.provided,
-            StageName.ESTIMATE_PRICE: estimate_price_runner.provided,
+            StageName.ESTIMATE_COST: estimate_cost_runner.provided,
             StageName.PERFORM_DELIVERY: perform_delivery_runner.provided,
             StageName.RELEASE_PERFORMER: release_performer_runner.provided,
             StageName.START_PIPELINE: start_pipeline_runner.provided,

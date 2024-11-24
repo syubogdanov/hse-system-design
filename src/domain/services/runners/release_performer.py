@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.status import Status
-from src.domain.services.exceptions import StageError
 from src.domain.services.runners.base import StageRunner
 
 
