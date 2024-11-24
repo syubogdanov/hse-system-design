@@ -13,7 +13,7 @@ PREFIX: Final[str] = f"/{TAG}"
 router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
-@router.get("latest")
+@router.get("/latest")
 async def get_latest() -> Config:
     """Получить актуальный конфиг."""
     adapter = CONTAINER.config_adapter()
