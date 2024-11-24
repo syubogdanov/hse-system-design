@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.status import Status
-from src.domain.services.exceptions import ExternalServiceError
 from src.domain.services.runners.base import StageRunner
 
 
@@ -48,8 +47,9 @@ class AssignPerformerRunner(StageRunner):
             zone = await self._geography.get_zone(order.source_address_id)
             nearest_performers = await self._performers.get_nearest(zone.id)
 
-        except ExternalServiceError:
+        except Exception:
             message = "Failed to get the geolocation of the performers"
+            self._logger.exception(message)
             return await self._finish(stage, Status.FAILED, message)
 
         if not nearest_performers:

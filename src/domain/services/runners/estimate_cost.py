@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, ClassVar, Self
 
 from src.domain.entities.status import Status
-from src.domain.services.exceptions import ExternalServiceError
 from src.domain.services.runners.base import StageRunner
 
 
@@ -57,8 +56,9 @@ class EstimateCostRunner(StageRunner):
             )
             load_factor = await self._geography.get_load_factor(source_zone.id)
 
-        except ExternalServiceError:
+        except Exception:
             message = "Information on the geography of the order could not be obtained"
+            self._logger.exception(message)
             return await self._finish(stage, Status.FAILED, message)
 
         calculated_cost = distance * config.rubles_per_meter * load_factor

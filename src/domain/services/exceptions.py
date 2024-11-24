@@ -12,7 +12,3 @@ class StageError(PipelineError):
 
 class NotFoundError(ServiceError):
     """Ошибка отсутствия данных."""
-
-
-class ExternalServiceError(Exception):
-    """Ошибка отсутствия соединения."""

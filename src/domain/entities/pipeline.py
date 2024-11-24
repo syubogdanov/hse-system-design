@@ -26,6 +26,7 @@ class Pipeline(BaseModel):
 
     def start(self: Self) -> None:
         """Запустить этап."""
+        self.status = Status.IN_PROGRESS
         self.started_at = utcnow()
 
     def finish(self: Self, status: Status, message: str | None = None) -> None:

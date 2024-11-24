@@ -29,6 +29,7 @@ from src.infrastructure.logging.factory import create_logger
 from src.infrastructure.settings.app import AppSettings
 from src.infrastructure.settings.config import ConfigSettings
 from src.infrastructure.settings.database import DatabaseSettings
+from src.infrastructure.settings.geography import GeographySettings
 from src.infrastructure.settings.grpc_api import GrpcApiSettings
 from src.infrastructure.settings.http_api import HttpApiSettings
 from src.infrastructure.settings.kafka import KafkaSettings
@@ -61,6 +62,7 @@ class Container(DeclarativeContainer):
     app_settings: Provider["AppSettings"] = Singleton(AppSettings)
     config_settings: Provider["ConfigSettings"] = Singleton(ConfigSettings)
     database_settings: Provider["DatabaseSettings"] = Singleton(DatabaseSettings)
+    geography_settings: Provider["GeographySettings"] = Singleton(GeographySettings)
     grpc_api_settings: Provider["GrpcApiSettings"] = Singleton(GrpcApiSettings)
     http_api_settings: Provider["HttpApiSettings"] = Singleton(HttpApiSettings)
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
@@ -117,6 +119,7 @@ class Container(DeclarativeContainer):
     geography_adapter: Provider["GeographyInterface"] = Singleton(
         GeographyAdapter,
         _logger=logger.provided,
+        _settings=geography_settings.provided,
     )
     order_adapter: Provider["OrderInterface"] = Singleton(
         OrderAdapter,

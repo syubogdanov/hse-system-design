@@ -115,6 +115,23 @@ services:
       - ${CONFIG_STUB_HTTP_API_PORT:?}:${CONFIG_STUB_HTTP_API_PORT:?}
     restart: unless-stopped
 
+  geography-stub-http-api:
+    build: ./stubs/geography/
+    command: [ "--start-http-api" ]
+    container_name: geography-stub-http-api
+    environment:
+      - HTTP_API_HOST=${GEOGRAPHY_STUB_HTTP_API_HOST:?}
+      - HTTP_API_PORT=${GEOGRAPHY_STUB_HTTP_API_PORT:?}
+    healthcheck:
+      test: curl --fail http://${GEOGRAPHY_STUB_HTTP_API_HOST:?}:${GEOGRAPHY_STUB_HTTP_API_PORT:?}/api/v1/healthcheck
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    hostname: ${GEOGRAPHY_STUB_HTTP_API_HOST:?}
+    ports:
+      - ${GEOGRAPHY_STUB_HTTP_API_PORT:?}:${GEOGRAPHY_STUB_HTTP_API_PORT:?}
+    restart: unless-stopped
+
   http-api:
     build: ./
     command: [ "--start-http-api" ]
@@ -183,8 +200,11 @@ services:
         condition: service_healthy
       topics:
         condition: service_completed_successfully
+      geography-stub-http-api:
+        condition: service_healthy
     environment:
       - CONFIG_SERVICE_URL=http://${CONFIG_STUB_HTTP_API_HOST:?}:${CONFIG_STUB_HTTP_API_PORT:?}
+      - GEOGRAPHY_SERVICE_URL=http://${GEOGRAPHY_STUB_HTTP_API_HOST:?}:${GEOGRAPHY_STUB_HTTP_API_PORT:?}
       - DATABASE_HOST=${DATABASE_HOST:?}
       - DATABASE_PORT=${DATABASE_PORT:?}
       - DATABASE_NAME=${DATABASE_NAME:?}

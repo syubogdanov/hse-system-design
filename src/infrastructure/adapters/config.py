@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import TYPE_CHECKING, ClassVar, Self
 
+from httpx import ConnectError, ConnectTimeout
 from sqlalchemy import select
 
 from autoclients.config_stub_client.api.configs import get_latest_api_v1_configs_latest_get
@@ -34,8 +36,25 @@ class ConfigAdapter(ConfigInterface):
     @retry_external_api
     async def actualize(self: Self) -> None:
         """Актуализировать конфигурацию."""
-        client = Client(self._settings.service_url, raise_on_unexpected_status=True)
-        response = await get_latest_api_v1_configs_latest_get.asyncio_detailed(client=client)
+        try:
+            client = Client(self._settings.service_url, raise_on_unexpected_status=True)
+            response = await get_latest_api_v1_configs_latest_get.asyncio_detailed(client=client)
+
+        except ConnectError as exception:
+            detail = "The connection to the service could not be established"
+            raise ConnectionError(detail) from exception
+
+        except ConnectTimeout as exception:
+            detail = "The service did not respond in the allotted time"
+            raise TimeoutError(detail) from exception
+
+        except Exception as exception:
+            detail = "An unexpected exception occurred"
+            raise OSError(detail) from exception
+
+        if response.status_code != HTTPStatus.OK:
+            detail = "The request was not successful'"
+            raise RuntimeError(detail)
 
         self._cached_config = Config.model_validate(response.parsed)
 
