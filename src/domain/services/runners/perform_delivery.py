@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class PerformOrderRunner(StageRunner):
-    """Начать выполнение заказа."""
+class PerformDeliveryRunner(StageRunner):
+    """Начать выполнение доставки."""
 
     _logger: "Logger"
     _stages: "StageInterface"

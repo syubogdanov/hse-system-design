@@ -9,10 +9,11 @@ from src.domain.services.launchers.pipeline import PipelineLauncher
 from src.domain.services.launchers.stage import StageLauncher
 from src.domain.services.runners.assign_performer import AssignPerformerRunner
 from src.domain.services.runners.estimate_price import EstimatePriceRunner
-from src.domain.services.runners.perform_order import PerformOrderRunner
+from src.domain.services.runners.perform_delivery import PerformDeliveryRunner
 from src.domain.services.runners.release_performer import ReleasePerformerRunner
 from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
+from src.infrastructure.adapters.delivery import DeliveryAdapter
 from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from src.domain.services.interfaces.config import ConfigInterface
+    from src.domain.services.interfaces.delivery import DeliveryInterface
     from src.domain.services.interfaces.order import OrderInterface
     from src.domain.services.interfaces.pipeline import PipelineInterface
     from src.domain.services.interfaces.stage import StageInterface
@@ -65,6 +67,10 @@ class Container(DeclarativeContainer):
         ConfigAdapter,
         _logger=logger.provided,
     )
+    delivery_adapter: Provider["DeliveryInterface"] = Singleton(
+        DeliveryAdapter,
+        _logger=logger.provided,
+    )
     order_adapter: Provider["OrderInterface"] = Singleton(
         OrderAdapter,
         _logger=logger.provided,
@@ -90,14 +96,16 @@ class Container(DeclarativeContainer):
         EstimatePriceRunner,
         _logger=logger.provided,
     )
-    perform_order_runner: Provider["StageRunner"] = Singleton(
-        PerformOrderRunner,
+    perform_delivery_runner: Provider["StageRunner"] = Singleton(
+        PerformDeliveryRunner,
         _logger=logger.provided,
         _stages=stage_adapter.provided,
     )
     release_performer_runner: Provider["StageRunner"] = Singleton(
         ReleasePerformerRunner,
+        _deliveries=delivery_adapter.provided,
         _logger=logger.provided,
+        _stages=stage_adapter.provided,
     )
     start_pipeline_runner: Provider["StageRunner"] = Singleton(
         StartPipelineRunner,
@@ -110,7 +118,7 @@ class Container(DeclarativeContainer):
         {
             StageName.ASSIGN_PERFORMER: assign_performer_runner.provided,
             StageName.ESTIMATE_PRICE: estimate_price_runner.provided,
-            StageName.PERFORM_ORDER: perform_order_runner.provided,
+            StageName.PERFORM_DELIVERY: perform_delivery_runner.provided,
             StageName.RELEASE_PERFORMER: release_performer_runner.provided,
             StageName.START_PIPELINE: start_pipeline_runner.provided,
         },

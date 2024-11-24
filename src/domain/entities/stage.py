@@ -14,7 +14,7 @@ class StageName(StrEnum):
     START_PIPELINE = auto()
     ESTIMATE_PRICE = auto()
     ASSIGN_PERFORMER = auto()
-    PERFORM_ORDER = auto()
+    PERFORM_DELIVERY = auto()
     RELEASE_PERFORMER = auto()
 
     def get_next(self: Self) -> "StageName | None":
@@ -22,8 +22,8 @@ class StageName(StrEnum):
         next_stages = {
             StageName.START_PIPELINE: StageName.ESTIMATE_PRICE,
             StageName.ESTIMATE_PRICE: StageName.ASSIGN_PERFORMER,
-            StageName.ASSIGN_PERFORMER: StageName.PERFORM_ORDER,
-            StageName.PERFORM_ORDER: StageName.RELEASE_PERFORMER,
+            StageName.ASSIGN_PERFORMER: StageName.PERFORM_DELIVERY,
+            StageName.PERFORM_DELIVERY: StageName.RELEASE_PERFORMER,
         }
         return next_stages.get(self)
 
