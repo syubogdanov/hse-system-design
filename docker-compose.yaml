@@ -162,8 +162,7 @@ services:
       config-stub-http-api:
         condition: service_healthy
     environment:
-      - CONFIG_HOST=${CONFIG_STUB_HTTP_API_HOST:?}
-      - CONFIG_port=${CONFIG_STUB_HTTP_API_PORT:?}
+      - CONFIG_SERVICE_URL=http://${CONFIG_STUB_HTTP_API_HOST:?}:${CONFIG_STUB_HTTP_API_PORT:?}
       - DATABASE_HOST=${DATABASE_HOST:?}
       - DATABASE_PORT=${DATABASE_PORT:?}
       - DATABASE_NAME=${DATABASE_NAME:?}

@@ -4,10 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class ConfigSettings(BaseSettings):
     """Настройки конфигурации."""
 
-    # Хост.
-    host: str
-    # Порт.
-    port: str
+    # URL сервиса.
+    service_url: str
 
     # Расписание актуализации.
     crontab: str = "* * * * *"

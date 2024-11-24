@@ -1,6 +1,7 @@
 from typing import Final
 
 from aiokafka.errors import KafkaError
+from httpx import ConnectError, ConnectTimeout
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 
@@ -17,7 +18,7 @@ retry_database = retry(
 
 retry_external_api = retry(
     reraise=True,
-    retry=retry_if_exception_type((ConnectionError, TimeoutError, OSError)),
+    retry=retry_if_exception_type((ConnectError, ConnectTimeout, OSError)),
     stop=stop_after_attempt(ATTEMPTS),
     wait=wait_fixed(WAIT),
 )

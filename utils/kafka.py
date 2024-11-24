@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Event(BaseModel):
@@ -14,3 +14,5 @@ class Event(BaseModel):
     def from_bytes(cls: type[Self], data: bytes) -> Self:
         """Сконструировать из `bytes`."""
         return cls.model_validate_json(data)
+
+    model_config = ConfigDict(from_attributes=True)

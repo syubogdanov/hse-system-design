@@ -1,7 +1,7 @@
 from typing import Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, NonNegativeFloat
+from pydantic import AwareDatetime, BaseModel, ConfigDict, NonNegativeFloat
 
 from utils.datetime import utcnow
 
@@ -17,6 +17,8 @@ class Delivery(BaseModel):
     performer_id: UUID | None = None
     assigned_at: AwareDatetime | None = None
     released_at: AwareDatetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
     def assign(self: Self, performer_id: UUID) -> None:
         """Назначить исполнителя."""

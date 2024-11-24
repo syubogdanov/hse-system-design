@@ -1,7 +1,7 @@
 from typing import Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from src.domain.entities.status import Status
 from utils.datetime import utcnow
@@ -17,6 +17,8 @@ class Pipeline(BaseModel):
     created_at: AwareDatetime = Field(default_factory=utcnow)
     started_at: AwareDatetime | None = None
     finished_at: AwareDatetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
     def is_restartable(self: Self) -> bool:
         """Проверить, может ли пайплайн быть перезапущен."""

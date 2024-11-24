@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from utils.datetime import utcnow
 
@@ -20,3 +20,5 @@ class Order(BaseModel):
     source_address_id: UUID
     target_address_id: UUID
     registered_at: AwareDatetime = Field(default_factory=utcnow)
+
+    model_config = ConfigDict(from_attributes=True)
