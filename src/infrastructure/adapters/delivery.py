@@ -10,6 +10,7 @@ from src.domain.services.interfaces.delivery import DeliveryInterface
 from src.infrastructure.adapters.constants import retry_database
 from src.infrastructure.models.delivery import DeliveryModel
 
+
 if TYPE_CHECKING:
     from logging import Logger
 
@@ -46,8 +47,8 @@ class DeliveryAdapter(DeliveryInterface):
 
         update_query = (
             update(self._delivery_model)
-                .where(self._delivery_model.id == delivery.id)
-                .values(**delivery_as_dict)
+            .where(self._delivery_model.pipeline_id == delivery.pipeline_id)
+            .values(**delivery_as_dict)
         )
 
         async with self._session_factory() as session:
@@ -56,4 +57,3 @@ class DeliveryAdapter(DeliveryInterface):
             if not query_result.rowcount:
                 model = self._delivery_model(**delivery_as_dict)
                 session.add(model)
-                await session.commit()

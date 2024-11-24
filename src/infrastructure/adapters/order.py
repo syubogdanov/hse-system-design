@@ -1,16 +1,17 @@
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, ClassVar, Self
 from uuid import UUID
-from datetime import datetime
 
-from sqlalchemy.sql import select, update, delete
+from sqlalchemy.sql import delete, select
 
 from src.domain.entities.order import Order, OrderParameters
 from src.domain.services.exceptions import NotFoundError
 from src.domain.services.interfaces.order import OrderInterface
-from src.infrastructure.models.order import OrderModel
 from src.infrastructure.adapters.constants import retry_database
+from src.infrastructure.models.order import OrderModel
+from utils.datetime import utcnow
+
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -43,34 +44,29 @@ class OrderAdapter(OrderInterface):
 
     @retry_database
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
-        """Зарегистрировать заказ."""
-        select_query = select(self._order_model).where(self._order_model.id == parameters.id)
+        """Зарегистрировать заказ, если такого еще не было."""
+        query = select(self._order_model).where(self._order_model.id == parameters.id)
 
         async with self._session_factory() as session:
-            select_result = await session.execute(select_query)
-            existing_order = select_result.scalar()
+            query_result = await session.execute(query)
 
-            if existing_order is not None:
-                return Order.model_validate(existing_order)
+            if (model := query_result.scalar()):
+                return None
 
-            new_order = self._order_model(
-                id=parameters.id,
-                source_address_id=parameters.source_address_id,
-                target_address_id=parameters.target_address_id,
-                registered_at=datetime.utcnow()
-            )
+            order = Order.model_validate(parameters)
+            model = self._order_model(**order.model_dump())
 
-            session.add(new_order)
-            await session.commit()
+            session.add(model)
 
-            return Order.model_validate(new_order)
+        return order
 
     @retry_database
     async def clean(self: Self, retention: timedelta) -> None:
         """Очистить устаревшие данные."""
-        cutoff_time = datetime.utcnow() - retention
+        query = (
+            delete(self._order_model)
+            .where(self._order_model.registered_at < utcnow() - retention)
+        )
 
         async with self._session_factory() as session:
-            delete_query = delete(self._order_model).where(self._order_model.registered_at < cutoff_time)
-            await session.execute(delete_query)
-            await session.commit()
+            await session.execute(query)

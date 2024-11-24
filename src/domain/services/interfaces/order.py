@@ -17,7 +17,7 @@ class OrderInterface(Protocol):
 
     @abstractmethod
     async def register(self: Self, parameters: "OrderParameters") -> "Order | None":
-        """Зарегистрировать заказ."""
+        """Зарегистрировать заказ, если такого еще не было."""
 
     @abstractmethod
     async def clean(self: Self, retention: timedelta) -> None:
