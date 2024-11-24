@@ -41,7 +41,7 @@ class StageLauncher:
 
             if pipeline.status == Status.CANCELED:
                 detail = "The pipeline is already canceled"
-                raise PipelineError(detail, pipeline, trigger)
+                raise PipelineError(detail)
 
             stage = Stage(
                 id=self._id_factory(),
@@ -68,7 +68,7 @@ class StageLauncher:
 
             if stage.status.is_final():
                 detail = "The stage is already finished"
-                raise StageError(detail, stage, result)
+                raise StageError(detail)
 
             # Можно не проверять, что пайплайн был отменен, потому что в таком
             # случае асинхронный этап тоже бы был отменен, что мы проверили на

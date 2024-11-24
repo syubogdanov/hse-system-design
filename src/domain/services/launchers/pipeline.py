@@ -35,11 +35,11 @@ class PipelineLauncher:
 
             if latest and not latest.status.is_final():
                 detail = "There is a running pipeline"
-                raise PipelineError(detail, latest)
+                raise PipelineError(detail)
 
             if latest and not latest.is_restartable():
                 detail = "The pipeline cannot be restarted"
-                raise PipelineError(detail, latest)
+                raise PipelineError(detail)
 
             pipeline = Pipeline(id=self._id_factory(), order_id=order_id)
             await self._pipelines.update_or_create(pipeline)
@@ -56,17 +56,17 @@ class PipelineLauncher:
 
             if not pipeline:
                 detail = "No pipelines have been launched yet"
-                raise NotFoundError(detail, order_id)
+                raise NotFoundError(detail)
 
             if pipeline.status.is_final():
                 detail = "The pipeline has already been finished"
-                raise PipelineError(detail, pipeline)
+                raise PipelineError(detail)
 
             stage = await self._stages.get_latest(pipeline.id)
 
             if stage and not stage.name.is_cancelable():
                 detail = "The current stage is not cancelable"
-                raise StageError(detail, stage)
+                raise StageError(detail)
 
             if stage and not stage.status.is_final():
                 stage.finish(Status.CANCELED)
