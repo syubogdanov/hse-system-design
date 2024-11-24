@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.status import Status
+from src.domain.services.exceptions import ExternalServiceError
 from src.domain.services.runners.base import StageRunner
 
 
@@ -47,11 +48,16 @@ class EstimateCostRunner(StageRunner):
         pipeline = await self._pipelines.get(stage.pipeline_id)
         order = await self._orders.get(pipeline.order_id)
 
-        distance, source_zone_id = await asyncio.gather(
-            self._geography.get_distance(order.source_address_id, order.target_address_id),
-            self._geography.get_zone(order.source_address_id),
-        )
-        load_factor = await self._geography.get_load_factor(source_zone_id)
+        try:
+            distance, source_zone = await asyncio.gather(
+                self._geography.get_distance(order.source_address_id, order.target_address_id),
+                self._geography.get_zone(order.source_address_id),
+            )
+            load_factor = await self._geography.get_load_factor(source_zone.id)
+
+        except ExternalServiceError:
+            message = "Information on the geography of the order could not be obtained"
+            return await self._finish(stage, Status.FAILED, message)
 
         calculated_price = distance * config.rubles_per_meter * load_factor
         price = max(config.min_cost, calculated_price)

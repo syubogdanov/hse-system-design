@@ -31,3 +31,7 @@ class Delivery(BaseModel):
         """Оценить стоимость заказа."""
         self.cost = cost
         self.estimated_at = utcnow()
+
+    def is_assigned(self: Self) -> bool:
+        """Проверить, что курьер назначен."""
+        return self.performer_id is not None

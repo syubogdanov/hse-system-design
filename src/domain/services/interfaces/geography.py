@@ -6,12 +6,14 @@ from uuid import UUID
 if TYPE_CHECKING:
     from pydantic import NonNegativeFloat
 
+    from src.domain.entities.zone import Zone
+
 
 class GeographyInterface(Protocol):
     """Интерфейс географии."""
 
     @abstractmethod
-    async def get_zone(self: Self, address_id: UUID) -> UUID:
+    async def get_zone(self: Self, address_id: UUID) -> "Zone":
         """Получить идентификатор области."""
 
     @abstractmethod

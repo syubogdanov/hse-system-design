@@ -7,11 +7,13 @@ from src.domain.services.interfaces.geography import GeographyInterface
 if TYPE_CHECKING:
     from pydantic import NonNegativeFloat
 
+    from src.domain.entities.zone import Zone
+
 
 class GeographyAdapter(GeographyInterface):
     """Интерфейс географии."""
 
-    async def get_zone(self: Self, address_id: UUID) -> UUID:
+    async def get_zone(self: Self, address_id: UUID) -> "Zone":
         """Получить идентификатор области."""
         raise NotImplementedError
 
