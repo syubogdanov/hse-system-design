@@ -14,6 +14,8 @@ from src.domain.services.runners.release_performer import ReleasePerformerRunner
 from src.domain.services.runners.start_pipeline import StartPipelineRunner
 from src.infrastructure.adapters.config import ConfigAdapter
 from src.infrastructure.adapters.delivery import DeliveryAdapter
+from src.infrastructure.adapters.kafka.consumer import KafkaConsumerAdapter
+from src.infrastructure.adapters.kafka.producer import KafkaProducerAdapter
 from src.infrastructure.adapters.order import OrderAdapter
 from src.infrastructure.adapters.pipeline import PipelineAdapter
 from src.infrastructure.adapters.stage import StageAdapter
@@ -28,6 +30,7 @@ from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
 from src.infrastructure.settings.order import OrderSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
+from src.infrastructure.settings.topic_name import TopicNameSettings
 
 
 if TYPE_CHECKING:
@@ -54,6 +57,7 @@ class Container(DeclarativeContainer):
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
     order_settings: Provider["OrderSettings"] = Singleton(OrderSettings)
     pipeline_settings: Provider["PipelineSettings"] = Singleton(PipelineSettings)
+    topic_name_settings: Provider["TopicNameSettings"] = Singleton(TopicNameSettings)
 
     logger: Provider["Logger"] = Singleton(
         create_logger,
@@ -62,6 +66,17 @@ class Container(DeclarativeContainer):
     )
 
     id_factory: Provider[UUID] = Callable(uuid4)
+
+    kafka_consumer_adapter: Provider["KafkaConsumerAdapter"] = Singleton(
+        KafkaConsumerAdapter,
+        _logger=logger.provided,
+        _settings=kafka_settings.provided,
+    )
+    kafka_producer_adapter: Provider["KafkaProducerAdapter"] = Singleton(
+        KafkaProducerAdapter,
+        _logger=logger.provided,
+        _settings=kafka_settings.provided,
+    )
 
     config_adapter: Provider["ConfigInterface"] = Singleton(
         ConfigAdapter,
@@ -86,6 +101,8 @@ class Container(DeclarativeContainer):
     trigger_adapter: Provider["TriggerInterface"] = Singleton(
         TriggerAdapter,
         _logger=logger.provided,
+        _producer=kafka_producer_adapter.provided,
+        _topic_name=topic_name_settings.provided.triggers,
     )
 
     assign_performer_runner: Provider["StageRunner"] = Singleton(

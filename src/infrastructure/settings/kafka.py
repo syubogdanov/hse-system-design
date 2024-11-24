@@ -15,9 +15,4 @@ class KafkaSettings(BaseSettings):
     # Идентфикатор клиента.
     client_id: str = Field(default_factory=gethostname)
 
-    # Название топика результатов.
-    result_topic_name: str
-    # Название топика триггеров.
-    trigger_topic_name: str
-
     model_config = SettingsConfigDict(env_prefix="kafka_")

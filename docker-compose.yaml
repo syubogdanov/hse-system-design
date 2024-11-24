@@ -22,7 +22,7 @@ services:
     build: ./
     command: |
       "
-      alembic --config migrations/alembic.ini revision --autogenerate --message "..."
+      alembic --config migrations/alembic.ini revision --autogenerate --message "migrations"
       alembic --config migrations/alembic.ini upgrade head
       "
     container_name: migrations
