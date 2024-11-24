@@ -104,6 +104,7 @@ class Container(DeclarativeContainer):
     config_adapter: Provider["ConfigInterface"] = Singleton(
         ConfigAdapter,
         _logger=logger.provided,
+        _session_factory=session_factory.provided,
     )
     delivery_adapter: Provider["DeliveryInterface"] = Singleton(
         DeliveryAdapter,
