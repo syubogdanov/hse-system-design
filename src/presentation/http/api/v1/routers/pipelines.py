@@ -17,14 +17,6 @@ PREFIX: Final[str] = f"/{TAG}"
 router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
-@router.get("")
-async def get_all(order_id: UUID | None = None) -> list[Pipeline]:
-    """Получить список всех пайплайнов."""
-    adapter = CONTAINER.pipeline_adapter()
-
-    return await adapter.get_all(order_id=order_id)
-
-
 @router.get("/{id}")
 async def get(pipeline_id: Annotated[UUID, Path(alias="id")]) -> Pipeline:
     """Получить пайплайн по идентификатору."""

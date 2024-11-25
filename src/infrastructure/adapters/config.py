@@ -3,7 +3,7 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING, ClassVar, Self
 
 from httpx import ConnectError, ConnectTimeout
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from autoclients.config_stub_client.api.configs import get_latest_api_v1_configs_latest_get
 from autoclients.config_stub_client.client import Client
@@ -50,16 +50,19 @@ class ConfigAdapter(ConfigInterface):
 
         except Exception as exception:
             detail = "An unexpected exception occurred"
-            raise OSError(detail) from exception
+            raise RuntimeError(detail) from exception
 
         if response.status_code != HTTPStatus.OK:
             detail = "The request was not successful'"
             raise RuntimeError(detail)
 
         self._cached_config = Config.model_validate(response.parsed)
+        model = self._config_model(**self._cached_config.model_dump())
+
+        delete_query = delete(self._config_model)
 
         async with self._session_factory() as session:
-            model = self._config_model(**self._cached_config.model_dump())
+            await session.execute(delete_query)
             session.add(model)
 
     @retry_database

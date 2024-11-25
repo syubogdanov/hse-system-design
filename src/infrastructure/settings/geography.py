@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class GeographySettings(BaseSettings):
-    """Настройки геолокации."""
+    """Настройки источника "Зонирование"."""
 
     # URL сервиса.
     service_url: str

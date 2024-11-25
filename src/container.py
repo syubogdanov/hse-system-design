@@ -35,6 +35,7 @@ from src.infrastructure.settings.http_api import HttpApiSettings
 from src.infrastructure.settings.kafka import KafkaSettings
 from src.infrastructure.settings.logging import LoggingSettings
 from src.infrastructure.settings.order import OrderSettings
+from src.infrastructure.settings.performer import PerformerSettings
 from src.infrastructure.settings.pipeline import PipelineSettings
 from src.infrastructure.settings.topic_name import TopicNameSettings
 
@@ -68,6 +69,7 @@ class Container(DeclarativeContainer):
     logging_settings: Provider["LoggingSettings"] = Singleton(LoggingSettings)
     kafka_settings: Provider["KafkaSettings"] = Singleton(KafkaSettings)
     order_settings: Provider["OrderSettings"] = Singleton(OrderSettings)
+    performer_settings: Provider["PerformerSettings"] = Singleton(PerformerSettings)
     pipeline_settings: Provider["PipelineSettings"] = Singleton(PipelineSettings)
     topic_name_settings: Provider["TopicNameSettings"] = Singleton(TopicNameSettings)
 
@@ -130,6 +132,7 @@ class Container(DeclarativeContainer):
         PerformerAdapter,
         _logger=logger.provided,
         _session_factory=session_factory.provided,
+        _settings=performer_settings.provided,
     )
     pipeline_adapter: Provider["PipelineInterface"] = Singleton(
         PipelineAdapter,

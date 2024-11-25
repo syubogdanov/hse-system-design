@@ -3,9 +3,9 @@ from typing import Annotated, Final
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path
-from pydantic import NonNegativeFloat
 
 from src.container import CONTAINER
+from src.domain.entities.delivery import Delivery
 from src.domain.entities.order import OrderParameters
 from src.domain.entities.pipeline import Pipeline
 
@@ -18,7 +18,7 @@ router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
 @router.post("/register", status_code=HTTPStatus.ACCEPTED)
-async def register(parameters: OrderParameters) -> None:
+async def register(parameters: OrderParameters) -> UUID:
     """Зарегистрировать заказ и начать пайплайн."""
     adapter = CONTAINER.order_adapter()
     launcher = CONTAINER.pipeline_launcher()
@@ -27,53 +27,7 @@ async def register(parameters: OrderParameters) -> None:
         detail = "The order has already been registered"
         raise HTTPException(HTTPStatus.CONFLICT, detail)
 
-    await launcher.start_or_restart(order.id)
-
-
-@router.get("/{id}/cost")
-async def get_cost(order_id: Annotated[UUID, Path(alias="id")]) -> NonNegativeFloat:
-    """Получить исполнителя заказа."""
-    delivery_adapter = CONTAINER.delivery_adapter()
-    pipeline_adapter = CONTAINER.pipeline_adapter()
-
-    if not (pipeline := await pipeline_adapter.get_latest(order_id)):
-        detail = "No pipelines have been launched yet"
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
-
-    if not pipeline.status.is_final():
-        detail = "The pipeline is still running..."
-        raise HTTPException(HTTPStatus.BAD_REQUEST, detail)
-
-    delivery = await delivery_adapter.get(pipeline.id)
-
-    if delivery.cost is None:
-        detail = "The cost has not been estimated"
-        raise HTTPException(HTTPStatus.EXPECTATION_FAILED, detail)
-
-    return delivery.cost
-
-
-@router.get("/{id}/performer")
-async def get_performer(order_id: Annotated[UUID, Path(alias="id")]) -> UUID:
-    """Получить исполнителя заказа."""
-    delivery_adapter = CONTAINER.delivery_adapter()
-    pipeline_adapter = CONTAINER.pipeline_adapter()
-
-    if not (pipeline := await pipeline_adapter.get_latest(order_id)):
-        detail = "No pipelines have been launched yet"
-        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
-
-    if not pipeline.status.is_final():
-        detail = "The pipeline is still running..."
-        raise HTTPException(HTTPStatus.BAD_REQUEST, detail)
-
-    delivery = await delivery_adapter.get(pipeline.id)
-
-    if not delivery.performer_id:
-        detail = "No performers have been assigned"
-        raise HTTPException(HTTPStatus.EXPECTATION_FAILED, detail)
-
-    return delivery.performer_id
+    return await launcher.start_or_restart(order.id)
 
 
 @router.get("/{id}/pipelines")
@@ -101,6 +55,19 @@ async def get_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -> Pi
     return pipeline
 
 
+@router.get("/{id}/pipelines/latest/delivery")
+async def get_delivery(order_id: Annotated[UUID, Path(alias="id")]) -> Delivery:
+    """Получить информацию по доставке."""
+    delivery_adapter = CONTAINER.delivery_adapter()
+    pipeline_adapter = CONTAINER.pipeline_adapter()
+
+    if not (pipeline := await pipeline_adapter.get_latest(order_id)):
+        detail = "No pipelines have been launched yet"
+        raise HTTPException(HTTPStatus.NOT_FOUND, detail)
+
+    return await delivery_adapter.get(pipeline.id)
+
+
 @router.post("/{id}/pipelines/latest/cancel")
 async def cancel_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -> None:
     """Отменить пайплайн."""
@@ -115,4 +82,3 @@ async def restart_latest_pipeline(order_id: Annotated[UUID, Path(alias="id")]) -
     launcher = CONTAINER.pipeline_launcher()
 
     return await launcher.start_or_restart(order_id)
-

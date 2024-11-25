@@ -14,14 +14,6 @@ PREFIX: Final[str] = f"/{TAG}"
 router = APIRouter(prefix=PREFIX, tags=[TAG])
 
 
-@router.get("")
-async def get_all(pipeline_id: UUID | None = None) -> list[Stage]:
-    """Получить список всех этапов."""
-    adapter = CONTAINER.stage_adapter()
-
-    return await adapter.get_all(pipeline_id=pipeline_id)
-
-
 @router.get("/{id}")
 async def get(stage_id: Annotated[UUID, Path(alias="id")]) -> Stage:
     """Получить этап по идентификатору."""
