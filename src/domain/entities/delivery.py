@@ -37,3 +37,11 @@ class Delivery(BaseModel):
     def is_assigned(self: Self) -> bool:
         """Проверить, что курьер назначен."""
         return self.performer_id is not None
+
+    def is_estimated(self: Self) -> bool:
+        """Проверить, что стоимость вычислена."""
+        return self.cost is not None
+
+    def is_ready(self: Self) -> bool:
+        """Проверить, что данные по доставке готовы."""
+        return self.is_assigned() and self.is_estimated()

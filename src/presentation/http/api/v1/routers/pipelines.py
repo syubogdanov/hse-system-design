@@ -43,4 +43,10 @@ async def get_delivery(pipeline_id: Annotated[UUID, Path(alias="id")]) -> Delive
     """Получить доставку, назначенную пайплайном."""
     adapter = CONTAINER.delivery_adapter()
 
-    return await adapter.get(pipeline_id)
+    delivery =  await adapter.get(pipeline_id)
+
+    if not delivery.is_ready():
+        detail = "The delivery details are not ready yet"
+        raise HTTPException(HTTPStatus.TOO_EARLY, detail)
+
+    return delivery

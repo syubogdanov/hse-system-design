@@ -21,7 +21,6 @@ from src.infrastructure.models.delivery import DeliveryModel
 if TYPE_CHECKING:
     from logging import Logger
 
-    from src.domain.entities.performer import Performer
     from src.infrastructure.settings.performer import PerformerSettings
     from utils.typing import SessionFactory
 
