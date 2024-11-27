@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-api-config-stub-system-design-org
+spec:
+  selector:
+    app: config-stub
+  ports:
+    - protocol: TCP
+      port: 7000
+      targetPort: 7000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-stub
+  labels:
+    app: config-stub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-stub
+  template:
+    metadata:
+      labels:
+        app: config-stub
+    spec:
+      containers:
+      - name: config-stub
+        image: hse-system-design-config-stub-http-api:latest
+        args: ["--start-http-api"]
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 7000
+        livenessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7000
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7000
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7000
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        env:
+          - name: HTTP_API_HOST
+            value: "0.0.0.0"
+          - name: HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: CONFIG_STUB_HTTP_API_PORT
+          
+          
+
+        

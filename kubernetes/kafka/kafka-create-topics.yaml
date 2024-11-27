@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-create-topics
+spec:
+  template:
+    spec:
+      containers:
+      - name: kafka-create-topics
+        image: confluentinc/cp-kafka:7.6.1
+        env:
+        - name: KAAS_BROKER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAAS_BROKER_PORT
+        - name: KAAS_BROKER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAAS_BROKER_HOST
+        - name: KAFKA_RESULT_TOPIC_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAFKA_RESULT_TOPIC_NAME
+        - name: KAFKA_TRIGGER_TOPIC_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAFKA_TRIGGER_TOPIC_NAME
+        command:
+        - /bin/sh
+        - -c
+        - |
+          kafka-topics --bootstrap-server $(KAAS_BROKER_HOST):$(KAAS_BROKER_PORT) --create --if-not-exists --topic $(KAFKA_RESULT_TOPIC_NAME)  --partitions 1
+          kafka-topics --bootstrap-server $(KAAS_BROKER_HOST):$(KAAS_BROKER_PORT) --create --if-not-exists --topic $(KAFKA_TRIGGER_TOPIC_NAME)  --partitions 1
+      restartPolicy: OnFailure

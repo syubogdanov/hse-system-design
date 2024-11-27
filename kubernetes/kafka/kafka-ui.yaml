@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: ui
+  selector:
+    app: kafka-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+      - name: kafka-ui
+        image: provectuslabs/kafka-ui:v0.7.2
+        env:
+        - name: KAFKA_CLUSTERS_0_NAME
+          value: KaaS
+        - name: KAAS_BROKER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAAS_BROKER_PORT
+        - name: KAAS_BROKER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: config
+              key: KAAS_BROKER_HOST
+        - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+          value: $(KAAS_BROKER_HOST):$(KAAS_BROKER_PORT)
+        
+        ports:
+        - containerPort: 8080

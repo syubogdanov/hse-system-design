@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrations
+spec:
+  template:
+    metadata:
+      labels:
+        app: migrations
+    spec:
+      containers:
+      - name: migrations
+        image: hse-system-design-migrations:latest
+        imagePullPolicy: Never
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            alembic --config migrations/alembic.ini revision --autogenerate --message "Initial migration";
+            alembic --config migrations/alembic.ini upgrade head;
+        env:
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_HOST
+          - name: DATABASE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PORT
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_NAME
+          - name: DATABASE_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_USERNAME
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PASSWORD
+      restartPolicy: OnFailure

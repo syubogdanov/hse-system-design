@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kaas-sorting-hat-system-design-org
+spec:
+  ports:
+  - port: 9092
+    targetPort: 9092
+    name: broker
+  selector:
+    app: broker-kafka
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broker-kafka
+  labels:
+    app: broker-kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broker-kafka
+  template:
+    metadata:
+      labels:
+        app: broker-kafka
+    spec:
+      containers:
+      - name: broker-kafka
+        image: confluentinc/cp-kafka:7.6.1
+        env:
+          - name: KAFKA_BROKER_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_BROKER_PORT
+          - name: KAAS_BROKER_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_BROKER_HOST
+          - name: KAFKA_ADVERTISED_LISTENERS
+            value: PLAINTEXT://$(KAAS_BROKER_HOST):$(KAFKA_BROKER_PORT)
+          - name: KAAS_ZOOKEEPER_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_ZOOKEEPER_HOST
+          - name: KAAS_ZOOKEEPER_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_ZOOKEEPER_PORT
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: $(KAAS_ZOOKEEPER_HOST):$(KAAS_ZOOKEEPER_PORT)
+          - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+            value: "1"
+          - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+            value: "1"
+          - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+            value: "1"
+        ports:
+        - containerPort: 9092
+        readinessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 9092
+          timeoutSeconds: 5

@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-api-performer-stub-system-design-org
+spec:
+  selector:
+    app: performer-stub
+  ports:
+    - protocol: TCP
+      port: 7200
+      targetPort: 7200
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: performer-stub
+  labels:
+    app: performer-stub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: performer-stub
+  template:
+    metadata:
+      labels:
+        app: performer-stub
+    spec:
+      containers:
+      - name: performer-stub
+        image: hse-system-design-performer-stub-http-api:latest
+        args: ["--start-http-api"]
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7200
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7200
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7200
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        env:
+          - name: HTTP_API_HOST
+            value: "0.0.0.0"
+          - name: HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: PERFORMER_STUB_HTTP_API_PORT
+        ports:
+        - containerPort: 7200

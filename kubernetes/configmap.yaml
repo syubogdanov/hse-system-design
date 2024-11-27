@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  KAAS_ZOOKEEPER_HOST: "zookeeper-sorting-hat-system-design-org"
+  KAAS_ZOOKEEPER_PORT: "2181"
+
+  KAAS_BROKER_HOST: "kaas-sorting-hat-system-design-org"
+  KAAS_BROKER_PORT: "9092"
+
+  KAAS_UI_PORT: "8080"
+
+  DATABASE_HOST: "dbaas-sorting-hat-system-design-org"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "sorting_hat"
+  DATABASE_USERNAME: "sorting-hat"
+  DATABASE_PASSWORD: "sorting-hat"
+
+  CONFIG_STUB_HTTP_API_HOST: "http-api-config-stub-system-design-org"
+  CONFIG_STUB_HTTP_API_PORT: "7000"
+
+  GEOGRAPHY_STUB_HTTP_API_HOST: "http-api-geography-stub-system-design-org"
+  GEOGRAPHY_STUB_HTTP_API_PORT: "7100"
+
+  PERFORMER_STUB_HTTP_API_HOST: "http-api-performer-stub-system-design-org"
+  PERFORMER_STUB_HTTP_API_PORT: "7200"
+
+  HTTP_API_HOST: "http-api-sorting-hat-system-design-org"
+  HTTP_API_PORT: "6100"
+
+  KAFKA_GROUP_ID: "sorting-hat.consumer-group"
+  KAFKA_RESULT_TOPIC_NAME: "result-channel"
+  KAFKA_TRIGGER_TOPIC_NAME: "trigger-channel"
+
+  REGISTRY_ID: "cr.yandex/crpkpm44mob1q7hn5ktn"

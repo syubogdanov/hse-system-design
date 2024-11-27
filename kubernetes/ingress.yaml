@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: http-api-ingress
+spec:
+  rules:
+    - host: sorting-hat
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: http-api-sorting-hat-system-design-org
+                port:
+                  number: 6100

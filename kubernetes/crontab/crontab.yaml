@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crontab
+  labels:
+    app: crontab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crontab
+  template:
+    metadata:
+      labels:
+        app: crontab
+    spec:
+      containers:
+      - name: crontab
+        image: hse-system-design-crontab:latest
+        args: ["--start-crontab"]
+        imagePullPolicy: Never
+        env:
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_HOST
+          - name: DATABASE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PORT
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_NAME
+          - name: DATABASE_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_USERNAME
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PASSWORD
+          - name: CONFIG_STUB_HTTP_API_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: CONFIG_STUB_HTTP_API_HOST
+          - name: CONFIG_STUB_HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: CONFIG_STUB_HTTP_API_PORT
+          - name: CONFIG_SERVICE_URL
+            value: "http://$(CONFIG_STUB_HTTP_API_HOST):$(CONFIG_STUB_HTTP_API_PORT)"

@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-api-geography-stub-system-design-org
+spec:
+  selector:
+    app: geography-stub
+  ports:
+    - protocol: TCP
+      port: 7100
+      targetPort: 7100
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geography-stub
+  labels:
+    app: geography-stub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geography-stub
+  template:
+    metadata:
+      labels:
+        app: geography-stub
+    spec:
+      containers:
+      - name: geography-stub
+        image: hse-system-design-geography-stub-http-api:latest
+        args: ["--start-http-api"]
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7100
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7100
+          failureThreshold: 1
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /api/v1/healthcheck
+            port: 7100
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        env:
+          - name: HTTP_API_HOST
+            value: "0.0.0.0"
+          - name: HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: GEOGRAPHY_STUB_HTTP_API_PORT
+        ports:
+        - containerPort: 7100

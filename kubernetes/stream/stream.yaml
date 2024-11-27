@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stream
+  labels:
+    app: stream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stream
+  template:
+    metadata:
+      labels:
+        app: stream
+    spec:
+      containers:
+      - name: stream
+        image: hse-system-design-stream:latest
+        args: ["--start-stream"]
+        imagePullPolicy: Never
+        env:
+          - name: CONFIG_STUB_HTTP_API_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: CONFIG_STUB_HTTP_API_HOST
+          - name: CONFIG_STUB_HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: CONFIG_STUB_HTTP_API_PORT
+          - name: CONFIG_SERVICE_URL
+            value: "http://$(CONFIG_STUB_HTTP_API_HOST):$(CONFIG_STUB_HTTP_API_PORT)"
+          - name: GEOGRAPHY_STUB_HTTP_API_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: GEOGRAPHY_STUB_HTTP_API_HOST
+          - name: GEOGRAPHY_STUB_HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: GEOGRAPHY_STUB_HTTP_API_PORT
+          - name: GEOGRAPHY_SERVICE_URL
+            value: "http://$(GEOGRAPHY_STUB_HTTP_API_HOST):$(GEOGRAPHY_STUB_HTTP_API_PORT)"
+          - name: PERFORMER_STUB_HTTP_API_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: PERFORMER_STUB_HTTP_API_HOST
+          - name: PERFORMER_STUB_HTTP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: PERFORMER_STUB_HTTP_API_PORT
+          - name: PERFORMER_SERVICE_URL
+            value: "http://$(PERFORMER_STUB_HTTP_API_HOST):$(PERFORMER_STUB_HTTP_API_PORT)"
+          - name: DATABASE_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_HOST
+          - name: DATABASE_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PORT
+          - name: DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_NAME
+          - name: DATABASE_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_USERNAME
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: DATABASE_PASSWORD
+          - name: KAAS_BROKER_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_BROKER_HOST
+          - name: KAAS_BROKER_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAAS_BROKER_PORT
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: "$(KAAS_BROKER_HOST):$(KAAS_BROKER_PORT)"
+          - name: KAFKA_GROUP_ID
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAFKA_GROUP_ID
+          - name: TOPIC_NAME_RESULTS
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAFKA_RESULT_TOPIC_NAME
+          - name: TOPIC_NAME_TRIGGERS
+            valueFrom:
+              configMapKeyRef:
+                name: config
+                key: KAFKA_TRIGGER_TOPIC_NAME
