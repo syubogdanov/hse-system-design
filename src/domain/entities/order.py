@@ -11,6 +11,7 @@ class OrderParameters(BaseModel):
     id: UUID
     source_address_id: UUID
     target_address_id: UUID
+    extra: str | None = None
 
 
 class Order(BaseModel):
@@ -19,6 +20,7 @@ class Order(BaseModel):
     id: UUID
     source_address_id: UUID
     target_address_id: UUID
+    extra: str | None = None
     registered_at: AwareDatetime = Field(default_factory=utcnow)
 
     model_config = ConfigDict(from_attributes=True)

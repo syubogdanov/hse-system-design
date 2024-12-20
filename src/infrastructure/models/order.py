@@ -16,4 +16,5 @@ class OrderModel(BaseModel):
     id: Mapped[UUID] = mapped_column(primary_key=True)
     source_address_id: Mapped[UUID]
     target_address_id: Mapped[UUID]
+    extra: Mapped[str | None]
     registered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
