@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Path
 
 from src.container import CONTAINER
 from src.domain.entities.delivery import Delivery
-from src.domain.entities.order import OrderParameters
+from src.domain.entities.order import Order, OrderParameters
 from src.domain.entities.pipeline import Pipeline
 from src.domain.entities.stage import Stage
 
@@ -29,6 +29,14 @@ async def register(parameters: OrderParameters) -> UUID:
         raise HTTPException(HTTPStatus.CONFLICT, detail)
 
     return await launcher.start_or_restart(order.id)
+
+
+@router.get("/{id}")
+async def get_order(order_id: Annotated[UUID, Path(alias="id")]) -> Order:
+    """Получить информацию по заказу."""
+    order_adapter = CONTAINER.order_adapter()
+
+    return await order_adapter.get(order_id=order_id)
 
 
 @router.get("/{id}/pipelines")
