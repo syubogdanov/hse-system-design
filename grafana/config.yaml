@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://$PROMETHEUS_HOST:$PROMETHEUS_PORT
+  - name: PostgreSQL
+    type: postgres
+    url: $DATABASE_HOST:$DATABASE_PORT
+    user: $DATABASE_USERNAME
+    secureJsonData:
+      password: $DATABASE_PASSWORD
+    jsonData:
+      database: $DATABASE_NAME
+      sslmode: 'disable'
+      maxOpenConns: 100
+      maxIdleConns: 100
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 903
+      timescaledb: false

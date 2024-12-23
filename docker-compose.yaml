@@ -252,6 +252,8 @@ services:
         condition: service_healthy
       performer-stub-http-api:
         condition: service_healthy
+      http-api:
+        condition: service_healthy
     environment:
       - API_URL=http://${HTTP_API_HOST:?}:${HTTP_API_PORT:?}
       - METRICS_PORT=${PROBER_PORT:?}
@@ -284,8 +286,50 @@ services:
         condition: service_healthy
       prober:
         condition: service_healthy
-    restart: unless-stopped
+    hostname: ${PROMETHEUS_HOST:?}
+    healthcheck:
+      test: [ "CMD", "wget", "http://localhost:${PROMETHEUS_PORT:?}"]
+      interval: 10s
+      timeout: 15s
+      retries: 10
+      start_period: 40s
     volumes:
       - "./prober/prometheus.yml:/etc/prometheus/prometheus.yml"
     ports:
       - ${PROMETHEUS_PORT:?}:${PROMETHEUS_PORT:?}
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    depends_on:
+      database:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+      topics:
+        condition: service_completed_successfully
+      geography-stub-http-api:
+        condition: service_healthy
+      performer-stub-http-api:
+        condition: service_healthy
+      prober:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:?}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?}
+      - PROMETHEUS_HOST=${PROMETHEUS_HOST:?}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT:?}
+      - DATABASE_HOST=${DATABASE_HOST:?}
+      - DATABASE_PORT=${DATABASE_PORT:?}
+      - DATABASE_NAME=${DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+    volumes:
+      - "./grafana:/etc/grafana/provisioning/datasources"
+    ports:
+      - ${GRAFANA_PORT:?}:${GRAFANA_PORT:?}
