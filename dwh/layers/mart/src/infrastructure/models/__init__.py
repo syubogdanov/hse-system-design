@@ -1,4 +1,4 @@
-from src.infrastructure.models.base import BaseModel
+from src.infrastructure.models.order import OrderModel
 
 
-__all__: list[str] = ["BaseModel"]
+__all__: list[str] = ["OrderModel"]
