@@ -1,37 +1,37 @@
 services:
-  dds-database:
+  dwh-dds-layer-database:
     image: pgduckdb/pgduckdb:16-main
-    container_name: dds-database
-    hostname: ${DWH_DDS_DATABASE_HOST:?}
+    container_name: dwh-dds-layer-database
+    hostname: ${DWH_DDS_LAYER_DATABASE_HOST:?}
     ports:
-      - ${DWH_DDS_DATABASE_PORT:?}:${DWH_DDS_DATABASE_PORT:?}
+      - ${DWH_DDS_LAYER_DATABASE_PORT:?}:${DWH_DDS_LAYER_DATABASE_PORT:?}
     restart: unless-stopped
-    command: [ "-h", "${DWH_DDS_DATABASE_HOST:?}", "-p", "${DWH_DDS_DATABASE_PORT:?}" ]
+    command: [ "-h", "${DWH_DDS_LAYER_DATABASE_HOST:?}", "-p", "${DWH_DDS_LAYER_DATABASE_PORT:?}" ]
     environment:
-      POSTGRES_USER: ${DWH_DDS_DATABASE_USERNAME:?}
-      POSTGRES_PASSWORD: ${DWH_DDS_DATABASE_PASSWORD:?}
-      POSTGRES_DB: ${DWH_DDS_DATABASE_NAME:?}
+      POSTGRES_USER: ${DWH_DDS_LAYER_DATABASE_USERNAME:?}
+      POSTGRES_PASSWORD: ${DWH_DDS_LAYER_DATABASE_PASSWORD:?}
+      POSTGRES_DB: ${DWH_DDS_LAYER_DATABASE_NAME:?}
     healthcheck:
-      test: pg_isready -U ${DWH_DDS_DATABASE_USERNAME:?} -d ${DWH_DDS_DATABASE_PASSWORD:?} -h ${DWH_DDS_DATABASE_HOST:?} -p ${DWH_DDS_DATABASE_PORT:?}
+      test: pg_isready -U ${DWH_DDS_LAYER_DATABASE_USERNAME:?} -d ${DWH_DDS_LAYER_DATABASE_PASSWORD:?} -h ${DWH_DDS_LAYER_DATABASE_HOST:?} -p ${DWH_DDS_LAYER_DATABASE_PORT:?}
       interval: 10s
       timeout: 5s
       retries: 5
 
-  dds-migrations:
+  dwh-dds-layer-migrations:
     build: ./
     command: |
       "
       alembic --config migrations/alembic.ini revision --autogenerate --message "migrations"
       alembic --config migrations/alembic.ini upgrade head
       "
-    container_name: dds-migrations
+    container_name: dwh-dds-layer-migrations
     depends_on:
-      dds-database:
+      dwh-dds-layer-database:
         condition: service_healthy
     entrypoint: [ "/bin/sh", "-c" ]
     environment:
-      - DATABASE_HOST=${DWH_DDS_DATABASE_HOST:?}
-      - DATABASE_PORT=${DWH_DDS_DATABASE_PORT:?}
-      - DATABASE_NAME=${DWH_DDS_DATABASE_NAME:?}
-      - DATABASE_USERNAME=${DWH_DDS_DATABASE_USERNAME:?}
-      - DATABASE_PASSWORD=${DWH_DDS_DATABASE_PASSWORD:?}
+      - DATABASE_HOST=${DWH_DDS_LAYER_DATABASE_HOST:?}
+      - DATABASE_PORT=${DWH_DDS_LAYER_DATABASE_PORT:?}
+      - DATABASE_NAME=${DWH_DDS_LAYER_DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DWH_DDS_LAYER_DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DWH_DDS_LAYER_DATABASE_PASSWORD:?}

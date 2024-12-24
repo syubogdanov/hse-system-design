@@ -1,31 +1,41 @@
 services:
 
-  ods-database:
+  dwh-raw-layer-database:
+    extends:
+      file: dwh/layers/raw/docker-compose.raw.yaml
+      service: dwh-raw-layer-database
+
+  dwh-ods-layer-database:
     extends:
       file: dwh/layers/ods/docker-compose.ods.yaml
-      service: ods-database
+      service: dwh-ods-layer-database
 
-  dds-database:
+  dwh-dds-layer-database:
     extends:
       file: dwh/layers/dds/docker-compose.dds.yaml
-      service: dds-database
+      service: dwh-dds-layer-database
 
-  mart-database:
+  dwh-mart-layer-database:
     extends:
       file: dwh/layers/mart/docker-compose.mart.yaml
-      service: mart-database
+      service: dwh-mart-layer-database
 
-  ods-migrations:
+  dwh-raw-layer-migrations:
+    extends:
+      file: dwh/layers/raw/docker-compose.raw.yaml
+      service: dwh-raw-layer-migrations
+
+  dwh-ods-layer-migrations:
     extends:
       file: dwh/layers/ods/docker-compose.ods.yaml
-      service: ods-migrations
+      service: dwh-ods-layer-migrations
 
-  dds-migrations:
+  dwh-dds-layer-migrations:
     extends:
       file: dwh/layers/dds/docker-compose.dds.yaml
-      service: dds-migrations
+      service: dwh-dds-layer-migrations
 
-  mart-migrations:
+  dwh-mart-layer-migrations:
     extends:
       file: dwh/layers/mart/docker-compose.mart.yaml
-      service: mart-migrations
+      service: dwh-mart-layer-migrations

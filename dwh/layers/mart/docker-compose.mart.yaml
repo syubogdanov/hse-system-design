@@ -1,37 +1,37 @@
 services:
-  mart-database:
+  dwh-mart-layer-database:
     image: pgduckdb/pgduckdb:16-main
-    container_name: mart-database
-    hostname: ${DWH_MART_DATABASE_HOST:?}
+    container_name: dwh-mart-layer-database
+    hostname: ${DWH_MART_LAYER_DATABASE_HOST:?}
     ports:
-      - ${DWH_MART_DATABASE_PORT:?}:${DWH_MART_DATABASE_PORT:?}
+      - ${DWH_MART_LAYER_DATABASE_PORT:?}:${DWH_MART_LAYER_DATABASE_PORT:?}
     restart: unless-stopped
-    command: [ "-h", "${DWH_MART_DATABASE_HOST:?}", "-p", "${DWH_MART_DATABASE_PORT:?}" ]
+    command: [ "-h", "${DWH_MART_LAYER_DATABASE_HOST:?}", "-p", "${DWH_MART_LAYER_DATABASE_PORT:?}" ]
     environment:
-      POSTGRES_USER: ${DWH_MART_DATABASE_USERNAME:?}
-      POSTGRES_PASSWORD: ${DWH_MART_DATABASE_PASSWORD:?}
-      POSTGRES_DB: ${DWH_MART_DATABASE_NAME:?}
+      POSTGRES_USER: ${DWH_MART_LAYER_DATABASE_USERNAME:?}
+      POSTGRES_PASSWORD: ${DWH_MART_LAYER_DATABASE_PASSWORD:?}
+      POSTGRES_DB: ${DWH_MART_LAYER_DATABASE_NAME:?}
     healthcheck:
-      test: pg_isready -U ${DWH_MART_DATABASE_USERNAME:?} -d ${DWH_MART_DATABASE_PASSWORD:?} -h ${DWH_MART_DATABASE_HOST:?} -p ${DWH_MART_DATABASE_PORT:?}
+      test: pg_isready -U ${DWH_MART_LAYER_DATABASE_USERNAME:?} -d ${DWH_MART_LAYER_DATABASE_PASSWORD:?} -h ${DWH_MART_LAYER_DATABASE_HOST:?} -p ${DWH_MART_LAYER_DATABASE_PORT:?}
       interval: 10s
       timeout: 5s
       retries: 5
 
-  mart-migrations:
+  dwh-mart-layer-migrations:
     build: ./
     command: |
       "
       alembic --config migrations/alembic.ini revision --autogenerate --message "migrations"
       alembic --config migrations/alembic.ini upgrade head
       "
-    container_name: mart-migrations
+    container_name: dwh-mart-layer-migrations
     depends_on:
-      mart-database:
+      dwh-mart-layer-database:
         condition: service_healthy
     entrypoint: [ "/bin/sh", "-c" ]
     environment:
-      - DATABASE_HOST=${DWH_MART_DATABASE_HOST:?}
-      - DATABASE_PORT=${DWH_MART_DATABASE_PORT:?}
-      - DATABASE_NAME=${DWH_MART_DATABASE_NAME:?}
-      - DATABASE_USERNAME=${DWH_MART_DATABASE_USERNAME:?}
-      - DATABASE_PASSWORD=${DWH_MART_DATABASE_PASSWORD:?}
+      - DATABASE_HOST=${DWH_MART_LAYER_DATABASE_HOST:?}
+      - DATABASE_PORT=${DWH_MART_LAYER_DATABASE_PORT:?}
+      - DATABASE_NAME=${DWH_MART_LAYER_DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DWH_MART_LAYER_DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DWH_MART_LAYER_DATABASE_PASSWORD:?}
