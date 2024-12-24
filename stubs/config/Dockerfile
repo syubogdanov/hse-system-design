@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt-get --yes update \
     && apt-get --yes install curl
 
-COPY poetry.lock pyproject.toml ./
+COPY pyproject.toml ./
 
 RUN python -m pip install --no-cache-dir poetry==1.8.4 \
     && poetry config virtualenvs.create false \

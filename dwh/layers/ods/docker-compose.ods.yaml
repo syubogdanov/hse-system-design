@@ -1,4 +1,5 @@
 services:
+
   ods-database:
     image: postgres:14-alpine
     container_name: ods-database
@@ -16,3 +17,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  ods-migrations:
+    build: ./
+    command: |
+      "
+      alembic --config migrations/alembic.ini revision --autogenerate --message "migrations"
+      alembic --config migrations/alembic.ini upgrade head
+      "
+    container_name: ods-migrations
+    depends_on:
+      ods-database:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    environment:
+      - DATABASE_HOST=${DWH_ODS_DATABASE_HOST:?}
+      - DATABASE_PORT=${DWH_ODS_DATABASE_PORT:?}
+      - DATABASE_NAME=${DWH_ODS_DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DWH_ODS_DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DWH_ODS_DATABASE_PASSWORD:?}

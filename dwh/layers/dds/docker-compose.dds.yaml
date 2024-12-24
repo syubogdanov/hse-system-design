@@ -16,3 +16,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  dds-migrations:
+    build: ./
+    command: |
+      "
+      alembic --config migrations/alembic.ini revision --autogenerate --message "migrations"
+      alembic --config migrations/alembic.ini upgrade head
+      "
+    container_name: dds-migrations
+    depends_on:
+      dds-database:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    environment:
+      - DATABASE_HOST=${DWH_DDS_DATABASE_HOST:?}
+      - DATABASE_PORT=${DWH_DDS_DATABASE_PORT:?}
+      - DATABASE_NAME=${DWH_DDS_DATABASE_NAME:?}
+      - DATABASE_USERNAME=${DWH_DDS_DATABASE_USERNAME:?}
+      - DATABASE_PASSWORD=${DWH_DDS_DATABASE_PASSWORD:?}
