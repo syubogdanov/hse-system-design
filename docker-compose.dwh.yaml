@@ -1,0 +1,31 @@
+services:
+
+  ods-database:
+    extends:
+      file: dwh/layers/ods/docker-compose.ods.yaml
+      service: ods-database
+
+  dds-database:
+    extends:
+      file: dwh/layers/dds/docker-compose.dds.yaml
+      service: dds-database
+
+  marts-database:
+    extends:
+      file: dwh/layers/marts/docker-compose.marts.yaml
+      service: marts-database
+
+  ods-migrations:
+    extends:
+      file: dwh/layers/ods/docker-compose.ods.yaml
+      service: ods-migrations
+
+  dds-migrations:
+    extends:
+      file: dwh/layers/dds/docker-compose.dds.yaml
+      service: dds-migrations
+
+  marts-migrations:
+    extends:
+      file: dwh/layers/marts/docker-compose.marts.yaml
+      service: marts-migrations
