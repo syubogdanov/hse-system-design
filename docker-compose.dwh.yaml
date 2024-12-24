@@ -10,10 +10,10 @@ services:
       file: dwh/layers/dds/docker-compose.dds.yaml
       service: dds-database
 
-  marts-database:
+  mart-database:
     extends:
-      file: dwh/layers/marts/docker-compose.marts.yaml
-      service: marts-database
+      file: dwh/layers/mart/docker-compose.mart.yaml
+      service: mart-database
 
   ods-migrations:
     extends:
@@ -25,7 +25,7 @@ services:
       file: dwh/layers/dds/docker-compose.dds.yaml
       service: dds-migrations
 
-  marts-migrations:
+  mart-migrations:
     extends:
-      file: dwh/layers/marts/docker-compose.marts.yaml
-      service: marts-migrations
+      file: dwh/layers/mart/docker-compose.mart.yaml
+      service: mart-migrations
