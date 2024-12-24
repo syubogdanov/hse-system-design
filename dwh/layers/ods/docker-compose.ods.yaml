@@ -1,0 +1,18 @@
+services:
+  ods-database:
+    image: postgres:14-alpine
+    container_name: ods-database
+    hostname: ${DWH_ODS_DATABASE_HOST:?}
+    ports:
+      - ${DWH_ODS_DATABASE_PORT:?}:${DWH_ODS_DATABASE_PORT:?}
+    restart: unless-stopped
+    command: [ "-h", "${DWH_ODS_DATABASE_HOST:?}", "-p", "${DWH_ODS_DATABASE_PORT:?}" ]
+    environment:
+      POSTGRES_USER: ${DWH_ODS_DATABASE_USERNAME:?}
+      POSTGRES_PASSWORD: ${DWH_ODS_DATABASE_PASSWORD:?}
+      POSTGRES_DB: ${DWH_ODS_DATABASE_NAME:?}
+    healthcheck:
+      test: pg_isready -U ${DWH_ODS_DATABASE_USERNAME:?} -d ${DWH_ODS_DATABASE_PASSWORD:?} -h ${DWH_ODS_DATABASE_HOST:?} -p ${DWH_ODS_DATABASE_PORT:?}
+      interval: 10s
+      timeout: 5s
+      retries: 5

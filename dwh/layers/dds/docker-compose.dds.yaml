@@ -1,0 +1,18 @@
+services:
+  dds-database:
+    image: pgduckdb/pgduckdb:16-main
+    container_name: dds-database
+    hostname: ${DWH_DDS_DATABASE_HOST:?}
+    ports:
+      - ${DWH_DDS_DATABASE_PORT:?}:${DWH_DDS_DATABASE_PORT:?}
+    restart: unless-stopped
+    command: [ "-h", "${DWH_DDS_DATABASE_HOST:?}", "-p", "${DWH_DDS_DATABASE_PORT:?}" ]
+    environment:
+      POSTGRES_USER: ${DWH_DDS_DATABASE_USERNAME:?}
+      POSTGRES_PASSWORD: ${DWH_DDS_DATABASE_PASSWORD:?}
+      POSTGRES_DB: ${DWH_DDS_DATABASE_NAME:?}
+    healthcheck:
+      test: pg_isready -U ${DWH_DDS_DATABASE_USERNAME:?} -d ${DWH_DDS_DATABASE_PASSWORD:?} -h ${DWH_DDS_DATABASE_HOST:?} -p ${DWH_DDS_DATABASE_PORT:?}
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -1,0 +1,18 @@
+services:
+  marts-database:
+    image: pgduckdb/pgduckdb:16-main
+    container_name: marts-database
+    hostname: ${DWH_MARTS_DATABASE_HOST:?}
+    ports:
+      - ${DWH_MARTS_DATABASE_PORT:?}:${DWH_MARTS_DATABASE_PORT:?}
+    restart: unless-stopped
+    command: [ "-h", "${DWH_MARTS_DATABASE_HOST:?}", "-p", "${DWH_MARTS_DATABASE_PORT:?}" ]
+    environment:
+      POSTGRES_USER: ${DWH_MARTS_DATABASE_USERNAME:?}
+      POSTGRES_PASSWORD: ${DWH_MARTS_DATABASE_PASSWORD:?}
+      POSTGRES_DB: ${DWH_MARTS_DATABASE_NAME:?}
+    healthcheck:
+      test: pg_isready -U ${DWH_MARTS_DATABASE_USERNAME:?} -d ${DWH_MARTS_DATABASE_PASSWORD:?} -h ${DWH_MARTS_DATABASE_HOST:?} -p ${DWH_MARTS_DATABASE_PORT:?}
+      interval: 10s
+      timeout: 5s
+      retries: 5
