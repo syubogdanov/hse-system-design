@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres_master
+    environment:
+      POSTGRES_USER: master_user
+      POSTGRES_PASSWORD: master_password
+      POSTGRES_DB: master_db
+      POSTGRES_HOST_AUTH_METHOD: trust  # Временно разрешаем все подключения
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+      - ./pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+
+  postgres_replica:
+    image: postgres:14
+    container_name: postgres_replica
+    user: postgres
+    environment:
+      POSTGRES_USER: replica_user
+      POSTGRES_PASSWORD: replica_password
+      POSTGRES_DB: master_db
+      POSTGRES_HOST_AUTH_METHOD: trust  # Временно разрешаем все подключения
+    depends_on:
+      - postgres
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+    ports:
+      - "5444:5432"
+    networks:
+      - postgres_network
+    command: >
+      bash -c "
+        until pg_isready -h postgres -U master_user; do
+          echo waiting for master...
+          sleep 2;
+        done;
+
+        PGPASSWORD=master_password pg_basebackup -h postgres -U master_user -D /var/lib/postgresql/replica --write-recovery-conf;
+        postgres -D /var/lib/postgresql/replica;
+      "
+
+
+volumes:
+  postgres_master_data:
+  postgres_replica_data:
+
+networks:
+  postgres_network:
