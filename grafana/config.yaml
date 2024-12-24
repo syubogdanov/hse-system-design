@@ -19,3 +19,18 @@ datasources:
       connMaxLifetime: 14400
       postgresVersion: 903
       timescaledb: false
+  - name: Mart
+    type: postgres
+    url: $DWH_MART_LAYER_DATABASE_HOST:$DWH_MART_LAYER_DATABASE_PORT
+    user: $DWH_MART_LAYER_DATABASE_USERNAME
+    secureJsonData:
+      password: $DWH_MART_LAYER_DATABASE_PASSWORD
+    jsonData:
+      database: $DWH_MART_LAYER_DATABASE_NAME
+      sslmode: 'disable'
+      maxOpenConns: 100
+      maxIdleConns: 100
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 903
+      timescaledb: false
