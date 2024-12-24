@@ -1,10 +1,5 @@
 services:
 
-  dwh-raw-layer-database:
-    extends:
-      file: dwh/layers/raw/docker-compose.raw.yaml
-      service: dwh-raw-layer-database
-
   dwh-ods-layer-database:
     extends:
       file: dwh/layers/ods/docker-compose.ods.yaml
@@ -19,11 +14,6 @@ services:
     extends:
       file: dwh/layers/mart/docker-compose.mart.yaml
       service: dwh-mart-layer-database
-
-  dwh-raw-layer-migrations:
-    extends:
-      file: dwh/layers/raw/docker-compose.raw.yaml
-      service: dwh-raw-layer-migrations
 
   dwh-ods-layer-migrations:
     extends:
