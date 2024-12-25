@@ -12,6 +12,3 @@ RUN python -m pip install --no-cache-dir poetry==1.8.4 \
     && poetry install --no-interaction --no-ansi
 
 COPY ./ ./
-
-ENTRYPOINT [ "python", "-B", "-m", "cli" ]
-CMD [ "--help" ]
